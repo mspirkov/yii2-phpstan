@@ -11,7 +11,7 @@ use MSpirkov\Yii2\PHPStan\Rules\NestedViewExistenceValidationRule;
  */
 final class NestedViewExistenceValidationRuleTest extends AbstractTestCase
 {
-    private const TIP = 'The view path is built from the "@app" alias set in the "mspirkovYii2Rules.aliases" parameter. It may point to the wrong directory.';
+    private const TIP = 'The view path is built from the "@app" alias set in the "mspirkovYii2.aliases" parameter. It may point to the wrong directory.';
 
     public function testRule(): void
     {
@@ -88,7 +88,7 @@ final class NestedViewExistenceValidationRuleTest extends AbstractTestCase
     private function unresolved(string $view, string $alias): string
     {
         return sprintf(
-            'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2Rules.aliases" parameter.',
+            'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2.aliases" parameter.',
             $view,
             $alias
         );

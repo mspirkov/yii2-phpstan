@@ -3,16 +3,16 @@
 [![PHP](https://img.shields.io/badge/%3E%3D7.4-7A86B8.svg?style=for-the-badge&logo=php&logoColor=white&label=PHP)](https://www.php.net/releases/7_4_0.php)
 [![Yii2](https://img.shields.io/badge/%3E%3D2.0.53-247BA0.svg?style=for-the-badge&logo=yii&logoColor=white&label=Yii)](https://github.com/yiisoft/yii2/releases/tag/2.0.53)
 [![PHPStan](https://img.shields.io/badge/%3E%3D2.2.0-247BA0.svg?style=for-the-badge&label=PHPStan)](https://github.com/phpstan/phpstan/releases/tag/2.2.0)
-[![Total Downloads](https://img.shields.io/packagist/dt/mspirkov/yii2-phpstan-rules.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads)](https://packagist.org/packages/mspirkov/yii2-phpstan-rules)
-[![Tests](https://img.shields.io/github/actions/workflow/status/mspirkov/yii2-phpstan-rules/ci.yml?branch=main&style=for-the-badge&logo=github&label=Tests)](https://github.com/mspirkov/yii2-phpstan-rules/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/mspirkov/yii2-phpstan-rules.svg?branch=main&style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/mspirkov/yii2-phpstan-rules)
-[![PHPStan Level Max](https://img.shields.io/badge/Max-7A86B8.svg?style=for-the-badge&label=PHPStan%20Level)](https://github.com/mspirkov/yii2-phpstan-rules/blob/main/phpstan.dist.neon)
+[![Total Downloads](https://img.shields.io/packagist/dt/mspirkov/yii2-phpstan.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads)](https://packagist.org/packages/mspirkov/yii2-phpstan)
+[![Tests](https://img.shields.io/github/actions/workflow/status/mspirkov/yii2-phpstan/ci.yml?branch=main&style=for-the-badge&logo=github&label=Tests)](https://github.com/mspirkov/yii2-phpstan/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/mspirkov/yii2-phpstan.svg?branch=main&style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/mspirkov/yii2-phpstan)
+[![PHPStan Level Max](https://img.shields.io/badge/Max-7A86B8.svg?style=for-the-badge&label=PHPStan%20Level)](https://github.com/mspirkov/yii2-phpstan/blob/main/phpstan.dist.neon)
 
-A set of [PHPStan](https://phpstan.org) rules for [Yii2](https://github.com/yiisoft/yii2) projects that I put together for my own day-to-day work. Yii2 leans heavily on loosely-typed config arrays and magic properties/methods that PHPStan can't see through on its own, and on conventions — like keeping business logic and database access out of controllers and views — that are easy to drift from without anyone noticing. These rules catch both: they validate Yii2-specific config and structure statically, and they enforce the architectural boundaries and other code-quality checks I try to keep in a codebase. In my experience they help keep a Yii2 codebase a bit cleaner and more maintainable, but they're just my opinions turned into checks, not a universal standard — use what's useful, ignore or disable the rest.
+A set of [PHPStan](https://phpstan.org) rules and type extensions for [Yii2](https://github.com/yiisoft/yii2) projects that I put together for my own day-to-day work. Yii2 leans heavily on loosely-typed config arrays and magic properties/methods that PHPStan can't see through on its own, and on conventions — like keeping business logic and database access out of controllers and views — that are easy to drift from without anyone noticing. These rules catch both: they validate Yii2-specific config and structure statically, and they enforce the architectural boundaries and other code-quality checks I try to keep in a codebase. The type extensions fill in types that Yii2 only resolves at runtime from the application config, such as the class behind a DI container ID. In my experience they help keep a Yii2 codebase a bit cleaner and more maintainable, but they're just my opinions turned into checks, not a universal standard — use what's useful, ignore or disable the rest.
 
 ## Support
 
-If you like this project, give it a ⭐ on [GitHub](https://github.com/mspirkov/yii2-phpstan-rules) — it helps others
+If you like this project, give it a ⭐ on [GitHub](https://github.com/mspirkov/yii2-phpstan) — it helps others
 discover it.
 
 ## Installation
@@ -23,17 +23,21 @@ discover it.
 > and [PHPStan](https://phpstan.org). The more up-to-date the versions are, the more accurate the analysis is.
 
 ```bash
-php composer.phar require --dev mspirkov/yii2-phpstan-rules
+php composer.phar require --dev mspirkov/yii2-phpstan
 ```
 
-If your project uses [`phpstan/extension-installer`](https://github.com/phpstan/extension-installer), the rules are picked up automatically — nothing else to do.
+If your project uses [`phpstan/extension-installer`](https://github.com/phpstan/extension-installer), the rules and the [type extensions](#type-extensions) are picked up automatically — nothing else to do.
 
 Otherwise, include them manually in your `phpstan.neon`:
 
 ```neon
 includes:
-    - vendor/mspirkov/yii2-phpstan-rules/rules.neon
+    - vendor/mspirkov/yii2-phpstan/extension.neon
 ```
+
+### Upgrading
+
+The package used to be called `mspirkov/yii2-phpstan-rules`. See [UPGRADE.md](UPGRADE.md) for how to migrate from it and between versions.
 
 ## Supported extensions
 
@@ -41,11 +45,11 @@ Recognized out of the box, no configuration needed: [yiisoft/yii2-mongodb](https
 
 ## Configuration
 
-All rules are on by default. Turn the whole set off, turn off just one of the two rule groups, or tune individual rules, under `parameters.mspirkovYii2Rules`:
+All rules are on by default. Turn the whole set off, turn off just one of the two rule groups, or tune individual rules, under `parameters.mspirkovYii2`:
 
 ```neon
 parameters:
-    mspirkovYii2Rules:
+    mspirkovYii2:
         # Master switch — false disables every rule below
         enableAllRules: false
 
@@ -71,6 +75,13 @@ parameters:
         # The controller ID is appended: `SiteController` reads `resources/frontend/views/site/*`.
         viewPaths:
             'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
+
+        # Application configs for code in a namespace (and its sub-namespaces), merged in order,
+        # the most specific namespace wins. Used by the type extensions, see "Type extensions" below.
+        applicationConfigs:
+            'app\frontend':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/frontend/config/main.php
 
         # Component IDs treated as "the database" by the DB-access rules
         yiiAppDbProperties:
@@ -123,6 +134,63 @@ parameters:
         noDynamicQueryWhere:
             enabled: false
 ```
+
+## Type extensions
+
+### `Container::get()` return type
+
+Out of the box, PHPStan types `Yii::$container->get()` as the requested class for a class name and as a plain `object` for anything else, so an alias like `'mailer'` loses its type, and an interface bound to a concrete class resolves only to the interface. This extension reads the container definitions (`container.definitions` and `container.singletons`) from your application configs and resolves `Container::get()` with a constant ID to the class that the definition leads to.
+
+Configs are set under `mspirkovYii2.applicationConfigs`, keyed by the namespace of the code they apply to. The most specific namespace wins, so `app\frontend\modules\api` takes precedence over `app\frontend` for code in that module. The files listed for a namespace are merged with `ArrayHelper::merge()` in the given order, the same way an entry script builds the application config. For a project based on [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced) with its code under the `app\backend`, `app\common`, `app\console` and `app\frontend` namespaces:
+
+```neon
+parameters:
+    mspirkovYii2:
+        applicationConfigs:
+            'app\backend':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+                - %currentWorkingDirectory%/backend/config/main.php
+                - %currentWorkingDirectory%/backend/config/main-local.php
+            'app\common':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+            'app\console':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+                - %currentWorkingDirectory%/console/config/main.php
+                - %currentWorkingDirectory%/console/config/main-local.php
+            'app\frontend':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+                - %currentWorkingDirectory%/frontend/config/main.php
+                - %currentWorkingDirectory%/frontend/config/main-local.php
+```
+
+Definitions are followed the way the container does it: class names, aliases (including chains of aliases), `Instance::of()`, `['class' => ...]` arrays and objects. Factories (closures, invokable objects and `[class, method]` arrays) resolve to their declared return type. When an ID can't be resolved, PHPStan's own `Container::get()` return type is kept. That covers a dynamic ID, an ID without a definition, a factory without a class return type, and a definition that leads to a missing class. Code outside the configured namespaces is left as is, including code without a namespace, such as view files.
+
+```php
+// common/config/main.php
+return [
+    'container' => [
+        'definitions' => [
+            MailerInterface::class => SmtpMailer::class,
+            'mailer' => MailerInterface::class,
+            'clock' => static fn(): SystemClock => new SystemClock(),
+            'payments' => [PaymentGatewayFactory::class, 'create'],
+        ],
+    ],
+];
+
+// frontend/controllers/SiteController.php, namespace app\frontend\controllers
+Yii::$container->get(MailerInterface::class); // SmtpMailer instead of MailerInterface
+Yii::$container->get('mailer');               // SmtpMailer instead of object
+Yii::$container->get('clock');                // SystemClock, the closure's return type
+Yii::$container->get('payments');             // the return type of PaymentGatewayFactory::create()
+Yii::$container->get($id);                    // object, the ID is not a constant
+```
+
+The config files are executed during analysis, so everything they rely on (`Yii.php`, aliases, constants like `YII_ENV`, environment variables) has to be available, e.g. through `bootstrapFiles`. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis with an error. A change to any of the config files, or to the files they include, invalidates the result cache.
 
 ## Rules at a glance
 

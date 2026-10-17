@@ -1,7 +1,7 @@
 parameters:
-	mspirkovYii2Rules:
+	mspirkovYii2:
 		enableAllRules: true
-		enableValidationRules: %mspirkovYii2Rules.enableAllRules%
+		enableValidationRules: %mspirkovYii2.enableAllRules%
 		yiiAppDbProperties:
 			- db
 		baseObjectConfigValidation:
@@ -10,6 +10,7 @@ parameters:
 		viewExtensions:
 			- php
 		viewPaths: []
+		applicationConfigs: []
 		actionComplexity:
 			ifCount: 3
 			foreachCount: 0
@@ -21,68 +22,68 @@ parameters:
 			ternaryCount: 1
 			tryCatchCount: 1
 		activeFormFieldValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		activeQueryWithValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		activeRecordConditionValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		activeRecordRelationValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		activeRecordUpdateValuesValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		baseObjectInstantiationValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		behaviorAttributesValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		componentBehaviorsValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		controllerActionsValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		controllerBehaviorActionsValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		controllerViewExistenceValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		htmlActiveAttributeValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		modelAttributeHintsValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		modelAttributeLabelsValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		modelRulesValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 			customValidators: []
 		modelScenariosValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		nestedViewExistenceValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		queryConditionValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		uploadedFileInstanceValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		viewRenderExistenceValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		widgetPropertiesValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		yiiCreateObjectValidation:
-			enabled: %mspirkovYii2Rules.enableValidationRules%
+			enabled: %mspirkovYii2.enableValidationRules%
 		noComplexActionClasses:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noComplexControllerActions:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noControllerActionCallsViaThis:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noDbQueriesInActions:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noDbQueriesInControllers:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noDbQueriesInViews:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noDirectSuperglobals:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noDynamicQueryWhere:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noForbiddenYiiAppProperties:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 			allowedProperties:
 				- id
 				- name
@@ -90,14 +91,14 @@ parameters:
 				- language
 				- timeZone
 		noRedundantExistenceCheck:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noRedundantHtmlEncode:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 		noYiiAppPropertyMutation:
-			enabled: %mspirkovYii2Rules.enableAllRules%
+			enabled: %mspirkovYii2.enableAllRules%
 
 parametersSchema:
-	mspirkovYii2Rules: structure([
+	mspirkovYii2: structure([
 		enableAllRules: bool()
 		enableValidationRules: bool()
 		yiiAppDbProperties: arrayOf(string())
@@ -110,6 +111,7 @@ parametersSchema:
 		aliases: arrayOf(string())
 		viewExtensions: listOf(string())
 		viewPaths: arrayOf(string())
+		applicationConfigs: arrayOf(listOf(string()), string())
 		actionComplexity: structure([
 			ifCount: int()
 			foreachCount: int()
@@ -229,73 +231,73 @@ parametersSchema:
 
 conditionalTags:
 	MSpirkov\Yii2\PHPStan\Rules\ActiveFormFieldValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.activeFormFieldValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.activeFormFieldValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ActiveQueryWithValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.activeQueryWithValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.activeQueryWithValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ActiveRecordConditionValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.activeRecordConditionValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.activeRecordConditionValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ActiveRecordRelationValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.activeRecordRelationValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.activeRecordRelationValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ActiveRecordUpdateValuesValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.activeRecordUpdateValuesValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.activeRecordUpdateValuesValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\BaseObjectInstantiationValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.baseObjectInstantiationValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.baseObjectInstantiationValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\BehaviorAttributesValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.behaviorAttributesValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.behaviorAttributesValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ComponentBehaviorsValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.componentBehaviorsValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.componentBehaviorsValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ControllerActionsValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.controllerActionsValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.controllerActionsValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ControllerBehaviorActionsValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.controllerBehaviorActionsValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.controllerBehaviorActionsValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ControllerViewExistenceValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.controllerViewExistenceValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.controllerViewExistenceValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\HtmlActiveAttributeValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.htmlActiveAttributeValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.htmlActiveAttributeValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ModelAttributeHintsValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.modelAttributeHintsValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.modelAttributeHintsValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ModelAttributeLabelsValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.modelAttributeLabelsValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.modelAttributeLabelsValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ModelRulesValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.modelRulesValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.modelRulesValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ModelScenariosValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.modelScenariosValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.modelScenariosValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NestedViewExistenceValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.nestedViewExistenceValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.nestedViewExistenceValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\QueryConditionValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.queryConditionValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.queryConditionValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\UploadedFileInstanceValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.uploadedFileInstanceValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.uploadedFileInstanceValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\ViewRenderExistenceValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.viewRenderExistenceValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.viewRenderExistenceValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\WidgetPropertiesValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.widgetPropertiesValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.widgetPropertiesValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\YiiCreateObjectValidationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.yiiCreateObjectValidation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.yiiCreateObjectValidation.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoComplexActionClassesRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noComplexActionClasses.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noComplexActionClasses.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoComplexControllerActionsRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noComplexControllerActions.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noComplexControllerActions.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoControllerActionCallsViaThisRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noControllerActionCallsViaThis.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noControllerActionCallsViaThis.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoDbQueriesInActionsRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noDbQueriesInActions.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noDbQueriesInActions.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoDbQueriesInControllersRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noDbQueriesInControllers.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noDbQueriesInControllers.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoDbQueriesInViewsRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noDbQueriesInViews.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noDbQueriesInViews.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoDirectSuperglobalsRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noDirectSuperglobals.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noDirectSuperglobals.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoDynamicQueryWhereRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noDynamicQueryWhere.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noDynamicQueryWhere.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoForbiddenYiiAppPropertiesRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noForbiddenYiiAppProperties.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noForbiddenYiiAppProperties.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoRedundantExistenceCheckRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noRedundantExistenceCheck.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noRedundantExistenceCheck.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoRedundantHtmlEncodeRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noRedundantHtmlEncode.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noRedundantHtmlEncode.enabled%
 	MSpirkov\Yii2\PHPStan\Rules\NoYiiAppPropertyMutationRule:
-		phpstan.rules.rule: %mspirkovYii2Rules.noYiiAppPropertyMutation.enabled%
+		phpstan.rules.rule: %mspirkovYii2.noYiiAppPropertyMutation.enabled%
 
 services:
 	-
@@ -329,7 +331,7 @@ services:
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\ModelRulesValidationRule
 		arguments:
-			customValidators: %mspirkovYii2Rules.modelRulesValidation.customValidators%
+			customValidators: %mspirkovYii2.modelRulesValidation.customValidators%
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\ModelScenariosValidationRule
 	-
@@ -363,7 +365,7 @@ services:
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\NoForbiddenYiiAppPropertiesRule
 		arguments:
-			allowedProperties: %mspirkovYii2Rules.noForbiddenYiiAppProperties.allowedProperties%
+			allowedProperties: %mspirkovYii2.noForbiddenYiiAppProperties.allowedProperties%
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\NoRedundantExistenceCheckRule
 	-
@@ -372,21 +374,26 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Rules\NoYiiAppPropertyMutationRule
 
 	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\ContainerGetDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+
+	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ActionComplexityAnalyzer
 		arguments:
-			ifCount: %mspirkovYii2Rules.actionComplexity.ifCount%
-			foreachCount: %mspirkovYii2Rules.actionComplexity.foreachCount%
-			forCount: %mspirkovYii2Rules.actionComplexity.forCount%
-			whileCount: %mspirkovYii2Rules.actionComplexity.whileCount%
-			doWhileCount: %mspirkovYii2Rules.actionComplexity.doWhileCount%
-			switchCount: %mspirkovYii2Rules.actionComplexity.switchCount%
-			matchCount: %mspirkovYii2Rules.actionComplexity.matchCount%
-			ternaryCount: %mspirkovYii2Rules.actionComplexity.ternaryCount%
-			tryCatchCount: %mspirkovYii2Rules.actionComplexity.tryCatchCount%
+			ifCount: %mspirkovYii2.actionComplexity.ifCount%
+			foreachCount: %mspirkovYii2.actionComplexity.foreachCount%
+			forCount: %mspirkovYii2.actionComplexity.forCount%
+			whileCount: %mspirkovYii2.actionComplexity.whileCount%
+			doWhileCount: %mspirkovYii2.actionComplexity.doWhileCount%
+			switchCount: %mspirkovYii2.actionComplexity.switchCount%
+			matchCount: %mspirkovYii2.actionComplexity.matchCount%
+			ternaryCount: %mspirkovYii2.actionComplexity.ternaryCount%
+			tryCatchCount: %mspirkovYii2.actionComplexity.tryCatchCount%
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\DbQueriesUsageAnalyzer
 		arguments:
-			yiiAppDbProperties: %mspirkovYii2Rules.yiiAppDbProperties%
+			yiiAppDbProperties: %mspirkovYii2.yiiAppDbProperties%
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\YiiAppAnalyzer
 	-
@@ -396,13 +403,15 @@ services:
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\BaseObjectConfigAnalyzer
 		arguments:
-			skippedClasses: %mspirkovYii2Rules.baseObjectConfigValidation.skippedClasses%
+			skippedClasses: %mspirkovYii2.baseObjectConfigValidation.skippedClasses%
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\BaseObjectPropertyAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ComponentConfigMethodAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ComponentObjectConfigAnalyzer
+	-
+		class: MSpirkov\Yii2\PHPStan\Analyzers\ContainerDefinitionAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ControllerActionAnalyzer
 		arguments:
@@ -412,16 +421,24 @@ services:
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ModelAnalyzer
 	-
+		class: MSpirkov\Yii2\PHPStan\Analyzers\NamespaceAnalyzer
+	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\QueryAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ViewFileAnalyzer
 		arguments:
-			aliases: %mspirkovYii2Rules.aliases%
-			extensions: %mspirkovYii2Rules.viewExtensions%
-			viewPaths: %mspirkovYii2Rules.viewPaths%
+			aliases: %mspirkovYii2.aliases%
+			extensions: %mspirkovYii2.viewExtensions%
+			viewPaths: %mspirkovYii2.viewPaths%
 	-
 		class: MSpirkov\Yii2\PHPStan\Finders\MethodReturnExpressionFinder
 	-
 		class: MSpirkov\Yii2\PHPStan\Visitors\MethodReturnExpressionVisitor
 	-
 		class: MSpirkov\Yii2\PHPStan\Resolvers\ExpressionValueResolver
+	-
+		class: MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider
+		arguments:
+			applicationConfigs: %mspirkovYii2.applicationConfigs%
+		tags:
+			- phpstan.resultCacheMetaExtension

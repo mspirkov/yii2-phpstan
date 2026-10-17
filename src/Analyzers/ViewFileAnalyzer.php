@@ -35,6 +35,8 @@ final class ViewFileAnalyzer
 
     private ExpressionValueResolver $expressionValueResolver;
 
+    private NamespaceAnalyzer $namespaceAnalyzer;
+
     /**
      * @param array<string, string> $aliases
      * @param list<string> $extensions
@@ -44,12 +46,14 @@ final class ViewFileAnalyzer
         array $aliases,
         array $extensions,
         array $viewPaths,
-        ExpressionValueResolver $expressionValueResolver
+        ExpressionValueResolver $expressionValueResolver,
+        NamespaceAnalyzer $namespaceAnalyzer
     ) {
         $this->aliases = $aliases;
         $this->extensions = $extensions;
         $this->viewPaths = $viewPaths;
         $this->expressionValueResolver = $expressionValueResolver;
+        $this->namespaceAnalyzer = $namespaceAnalyzer;
     }
 
     public function isViewFile(string $file): bool
@@ -97,7 +101,7 @@ final class ViewFileAnalyzer
         if ($resolution['unresolvedAlias'] !== null) {
             return [
                 'message' => sprintf(
-                    'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2Rules.aliases" parameter.',
+                    'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2.aliases" parameter.',
                     $view,
                     $resolution['unresolvedAlias']
                 ),
@@ -118,7 +122,7 @@ final class ViewFileAnalyzer
             'tip' => $resolution['alias'] === null
                 ? null
                 : sprintf(
-                    'The view path is built from the "%s" alias set in the "mspirkovYii2Rules.aliases" parameter. It may point to the wrong directory.',
+                    'The view path is built from the "%s" alias set in the "mspirkovYii2.aliases" parameter. It may point to the wrong directory.',
                     $resolution['alias']
                 ),
         ];
@@ -266,18 +270,10 @@ final class ViewFileAnalyzer
      */
     private function findConfiguredNamespace(array $namespaceSegments): ?string
     {
-        $namespace = implode('\\', $namespaceSegments);
-
-        foreach (array_keys($this->getViewDirectories()) as $configuredNamespace) {
-            if (
-                $namespace === $configuredNamespace
-                || strncmp($namespace, $configuredNamespace . '\\', strlen($configuredNamespace) + 1) === 0
-            ) {
-                return $configuredNamespace;
-            }
-        }
-
-        return null;
+        return $this->namespaceAnalyzer->findClosestNamespace(
+            implode('\\', $namespaceSegments),
+            array_keys($this->getViewDirectories())
+        );
     }
 
     /**

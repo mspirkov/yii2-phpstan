@@ -1,7 +1,7 @@
 parameters:
 	scanFiles:
 		- ../../Data/NoComplexActions/custom-config.php
-	mspirkovYii2Rules:
+	mspirkovYii2:
 		actionComplexity:
 			ifCount: 4
 			foreachCount: 1

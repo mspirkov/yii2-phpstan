@@ -79,5 +79,5 @@ final class Identifiers
         self::NO_YII_APP_PROPERTY_MUTATION,
     ];
 
-    private const PREFIX = 'mspirkovYii2Rules.';
+    private const PREFIX = 'mspirkovYii2.';
 }
