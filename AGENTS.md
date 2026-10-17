@@ -55,7 +55,7 @@ vendor/bin/php-cs-fixer check                           # code style (fix with `
 vendor/bin/rector process --dry-run                     # no leftover simplifications rector would apply
 ```
 
-Coverage is expected to stay at 100% (`tests/coverage/`, tracked via Codecov) — a new rule needs fixture cases hitting every early-return branch, not just the "fires" case. When unsure whether a branch is covered, generate the clover report and grep for `count="0"` lines in the new file rather than guessing from the fixture alone. Type extension tests (`TypeInferenceTestCase`) call `gatherAssertTypes()` inside the test method, with the data provider yielding only file paths: data providers run before coverage is collected, so analysing there leaves the extension reported as uncovered.
+Coverage is expected to stay at 100% (`tests/coverage/`, tracked via Codecov) — a new rule needs fixture cases hitting every early-return branch, not just the "fires" case. When unsure whether a branch is covered, generate the clover report and grep for `count="0"` lines in the new file rather than guessing from the fixture alone. Type extension tests (`TypeInferenceTestCase`) call `gatherAssertTypes()` inside the test method, with the data provider yielding only file paths: data providers run before coverage is collected, so analysing there leaves the extension reported as uncovered. In `assertType()`, name classes with `::class` (imported, concatenated where the type has more around it, e.g. `Foo::class . '|null'`), not as FQCN strings.
 
 ## Conventions worth knowing
 
