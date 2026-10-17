@@ -35,6 +35,9 @@ return RectorConfig::configure()
         __DIR__ . '/phpstan.dist.neon',
     ])
     ->withSkip([
+        __DIR__ . '/tests/Config/Data',
+        __DIR__ . '/tests/Extensions/Data',
+        __DIR__ . '/tests/Extensions/Source',
         __DIR__ . '/tests/Rules/Data',
         __DIR__ . '/tests/Rules/Source',
         // PHP 7.4

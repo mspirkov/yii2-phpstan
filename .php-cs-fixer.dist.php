@@ -14,6 +14,9 @@ use PhpCsFixerCustomFixers\Fixers;
 $finder = (new Finder())
     ->in(__DIR__)
     ->exclude([
+        'tests/Config/Data',
+        'tests/Extensions/Data',
+        'tests/Extensions/Source',
         'tests/Rules/Data',
         'tests/Rules/Source'
     ]);

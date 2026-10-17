@@ -17,7 +17,7 @@ abstract class AbstractTestCase extends RuleTestCase
     public static function getAdditionalConfigFiles(): array
     {
         return array_merge(parent::getAdditionalConfigFiles(), [
-            __DIR__ . '/../../rules.neon',
+            __DIR__ . '/../../extension.neon',
         ]);
     }
 

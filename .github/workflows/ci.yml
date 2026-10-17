@@ -10,6 +10,7 @@ on:
       - "AGENTS.md"
       - "LICENSE.md"
       - "README.md"
+      - "UPGRADE.md"
 
   pull_request:
     branches:
@@ -21,6 +22,7 @@ on:
       - "AGENTS.md"
       - "LICENSE.md"
       - "README.md"
+      - "UPGRADE.md"
 
 jobs:
   codestyle:

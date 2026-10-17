@@ -91,7 +91,7 @@ final class ControllerViewExistenceValidationRuleTest extends AbstractTestCase
     private function tip(string $alias): string
     {
         return sprintf(
-            'The view path is built from the "%s" alias set in the "mspirkovYii2Rules.aliases" parameter. It may point to the wrong directory.',
+            'The view path is built from the "%s" alias set in the "mspirkovYii2.aliases" parameter. It may point to the wrong directory.',
             $alias
         );
     }
@@ -99,7 +99,7 @@ final class ControllerViewExistenceValidationRuleTest extends AbstractTestCase
     private function unresolved(string $view, string $alias): string
     {
         return sprintf(
-            'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2Rules.aliases" parameter.',
+            'View "%s" uses the alias "%s" that cannot be resolved. Add it to the "mspirkovYii2.aliases" parameter.',
             $view,
             $alias
         );

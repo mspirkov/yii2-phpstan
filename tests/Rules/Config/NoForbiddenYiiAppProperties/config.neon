@@ -1,5 +1,5 @@
 parameters:
-	mspirkovYii2Rules:
+	mspirkovYii2:
 		noForbiddenYiiAppProperties:
 			allowedProperties:
 				- id
