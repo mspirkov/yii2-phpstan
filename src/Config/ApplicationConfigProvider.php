@@ -16,6 +16,9 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
     /** @var array<string, list<string>> */
     private array $applicationConfigs = [];
 
+    /** @var list<string> */
+    private array $bootstrapFiles;
+
     private NamespaceAnalyzer $namespaceAnalyzer;
 
     /** @var array<string, array<mixed>> */
@@ -29,9 +32,11 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
 
     /**
      * @param array<string, list<string>> $applicationConfigs
+     * @param list<string> $bootstrapFiles
      */
     public function __construct(
         array $applicationConfigs,
+        array $bootstrapFiles,
         NamespaceAnalyzer $namespaceAnalyzer
     ) {
         foreach ($applicationConfigs as $namespace => $files) {
@@ -46,6 +51,7 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
             $this->applicationConfigs[$normalizedNamespace] = $files;
         }
 
+        $this->bootstrapFiles = $bootstrapFiles;
         $this->namespaceAnalyzer = $namespaceAnalyzer;
     }
 
@@ -119,6 +125,8 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
         }
 
         if (!isset($this->loadedFiles[$path])) {
+            $this->loadBootstrapFiles();
+
             $includedFiles = get_included_files();
             $config = (static fn(string $file) => require $file)($path);
             if (!is_array($config)) {
@@ -133,5 +141,23 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
         }
 
         return $this->loadedFiles[$path];
+    }
+
+    /**
+     * PHPStan runs the bootstrapFiles only once the analysis starts, after the result cache has called
+     * getHash(), but the configs may rely on what they define. require_once, as in PHPStan, keeps them
+     * from running twice.
+     */
+    private function loadBootstrapFiles(): void
+    {
+        foreach ($this->bootstrapFiles as $file) {
+            if (!is_file($file)) {
+                throw new InvalidConfigException(sprintf('Bootstrap file "%s" does not exist.', $file));
+            }
+
+            (static function (string $file): void {
+                require_once $file;
+            })($file);
+        }
     }
 }

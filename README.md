@@ -153,7 +153,7 @@ parameters:
 
 ## Type extensions
 
-The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its namespace. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
+The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its namespace. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
 
 ### `Container::get()` return type
 
