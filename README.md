@@ -50,32 +50,6 @@ All rules are on by default. Turn the whole set off, turn off just one of the tw
 ```neon
 parameters:
     mspirkovYii2:
-        # Master switch — false disables every rule below
-        enableAllRules: false
-
-        # Covers just the `*Validation` rules (config/shape checks like modelRulesValidation,
-        # componentBehaviorsValidation, activeQueryWithValidation, ...) — defaults to
-        # enableAllRules, so setting it only makes sense when it should differ. Here it keeps
-        # static config validation on while the `no*` code-quality rules stay off.
-        enableValidationRules: true
-
-        # Root aliases (`@app`, not `@app/modules`) mapped to plain directory paths, used by the view existence
-        # rules to resolve `@alias/...` names; `//...` names go through `@app/views`
-        # A name that uses an alias missing here is reported.
-        aliases:
-            '@app': %currentWorkingDirectory%
-            '@shared': %currentWorkingDirectory%/modules/shared
-
-        # Extensions tried for view names without one, in order
-        viewExtensions:
-            - php
-            - twig
-
-        # Views directory for controllers in a namespace (and its sub-namespaces), the most specific one wins.
-        # The controller ID is appended: `SiteController` reads `resources/frontend/views/site/*`.
-        viewPaths:
-            'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
-
         # Application configs for the type extensions. The files of an entry are merged with
         # ArrayHelper::merge() in order and apply to the code in its paths (directories or files, the most
         # specific one wins). Here for yii2-app-advanced:
@@ -110,6 +84,32 @@ parameters:
                     - %currentWorkingDirectory%/common/config/main-local.php
                     - %currentWorkingDirectory%/frontend/config/main.php
                     - %currentWorkingDirectory%/frontend/config/main-local.php
+
+        # Master switch — false disables every rule below
+        enableAllRules: false
+
+        # Covers just the `*Validation` rules (config/shape checks like modelRulesValidation,
+        # componentBehaviorsValidation, activeQueryWithValidation, ...) — defaults to
+        # enableAllRules, so setting it only makes sense when it should differ. Here it keeps
+        # static config validation on while the `no*` code-quality rules stay off.
+        enableValidationRules: true
+
+        # Root aliases (`@app`, not `@app/modules`) mapped to plain directory paths, used by the view existence
+        # rules to resolve `@alias/...` names; `//...` names go through `@app/views`
+        # A name that uses an alias missing here is reported.
+        aliases:
+            '@app': %currentWorkingDirectory%
+            '@shared': %currentWorkingDirectory%/modules/shared
+
+        # Extensions tried for view names without one, in order
+        viewExtensions:
+            - php
+            - twig
+
+        # Views directory for controllers in a namespace (and its sub-namespaces), the most specific one wins.
+        # The controller ID is appended: `SiteController` reads `resources/frontend/views/site/*`.
+        viewPaths:
+            'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
 
         # Component IDs treated as "the database" by the DB-access rules
         yiiAppDbProperties:
@@ -203,6 +203,8 @@ Yii::$app->get('payments'); // StripeGateway instead of object
 ### `Yii::$app->params`
 
 Resolves to an array shape with the keys of `params` and their values generalized to types, since the values usually differ between environments.
+
+PHPStan 2.3 seems to have a bug here: `isset()` and `??` directly on `Yii::$app->params[...]` narrow the declared `array` type of the property instead of the resolved shape, so the result is `mixed`. Reading the params into a variable first keeps the shape.
 
 ```php
 'params' => [

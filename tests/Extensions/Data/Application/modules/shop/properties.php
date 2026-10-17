@@ -22,5 +22,8 @@ function components(Application $app): void
 function params(Application $app): void
 {
     assertType('string', $app->params['adminEmail']);
-    assertType('string', $app->params['frontendKey'] ?? 'default');
+
+    // Through a variable: PHPStan 2.3 seems to narrow `$app->params[...] ?? ...` from the declared `array` type.
+    $params = $app->params;
+    assertType('string', $params['frontendKey'] ?? 'default');
 }
