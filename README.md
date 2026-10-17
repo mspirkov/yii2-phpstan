@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/18ff3ba0-2025-4df8-a3c7-4d9d104a4dab" />
+<img src="https://github.com/user-attachments/assets/eb31e0ab-dbef-49a6-abd7-e0353bbe582e" />
 
 [![PHP](https://img.shields.io/badge/%3E%3D7.4-7A86B8.svg?style=for-the-badge&logo=php&logoColor=white&label=PHP)](https://www.php.net/releases/7_4_0.php)
 [![Yii2](https://img.shields.io/badge/%3E%3D2.0.53-247BA0.svg?style=for-the-badge&logo=yii&logoColor=white&label=Yii)](https://github.com/yiisoft/yii2/releases/tag/2.0.53)
