@@ -7,7 +7,9 @@ namespace MSpirkov\Yii2\PHPStan\Analyzers;
 use Closure;
 use MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider;
 use MSpirkov\Yii2\PHPStan\Resolvers\ConfigValueTypeResolver;
+use PHPStan\Analyser\Scope;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use yii\di\Instance;
 
 final class ContainerDefinitionAnalyzer
@@ -24,20 +26,34 @@ final class ContainerDefinitionAnalyzer
         $this->configValueTypeResolver = $configValueTypeResolver;
     }
 
-    public function resolveType(string $id, ?string $namespace): ?Type
+    public function resolveType(string $id, Scope $scope): ?Type
     {
-        $definitions = $this->getDefinitions($namespace);
+        // A class ID keeps the class Yii declares for it, not the implementation it's mapped to.
+        if ($this->configValueTypeResolver->resolveClassType($id) !== null) {
+            return null;
+        }
 
-        return array_key_exists($id, $definitions) ? $this->resolveDefinitionType($id, $definitions, []) : null;
+        $types = [];
+        foreach ($this->applicationConfigProvider->findConfigs($scope->getFile()) as $config) {
+            $type = $this->resolveNamedType($id, $this->getDefinitions($config), []);
+            if ($type === null) {
+                return null;
+            }
+
+            $types[] = $type;
+        }
+
+        return $types === [] ? null : TypeCombinator::union(...$types);
     }
 
     /**
      * @param mixed $type
+     * @param array<mixed> $config
      */
-    public function resolveCreateObjectType($type, ?string $namespace): ?Type
+    public function resolveCreateObjectType($type, array $config): ?Type
     {
         if (is_string($type)) {
-            return $this->resolveDefinitionType($type, $this->getDefinitions($namespace), []);
+            return $this->resolveNamedType($type, $this->getDefinitions($config), []);
         }
 
         if ($this->isCallableDefinition($type)) {
@@ -46,15 +62,17 @@ final class ContainerDefinitionAnalyzer
 
         $class = is_array($type) ? $type['__class'] ?? $type['class'] ?? null : null;
 
-        return is_string($class) ? $this->resolveDefinitionType($class, $this->getDefinitions($namespace), []) : null;
+        return is_string($class) ? $this->resolveNamedType($class, $this->getDefinitions($config), []) : null;
     }
 
     /**
+     * @param array<mixed> $config
+     *
      * @return array<mixed>
      */
-    private function getDefinitions(?string $namespace): array
+    private function getDefinitions(array $config): array
     {
-        $container = $this->applicationConfigProvider->findConfig($namespace)['container'] ?? null;
+        $container = $config['container'] ?? null;
         if (!is_array($container)) {
             return [];
         }
@@ -87,15 +105,23 @@ final class ContainerDefinitionAnalyzer
     }
 
     /**
+     * A class name resolves to that class, an alias to the type of its definition.
+     *
+     * @param array<mixed> $definitions
+     * @param array<string, true> $visited
+     */
+    private function resolveNamedType(string $name, array $definitions, array $visited): ?Type
+    {
+        return $this->configValueTypeResolver->resolveClassType($name)
+            ?? (array_key_exists($name, $definitions) ? $this->resolveDefinitionType($name, $definitions, $visited) : null);
+    }
+
+    /**
      * @param array<mixed> $definitions
      * @param array<string, true> $visited
      */
     private function resolveDefinitionType(string $id, array $definitions, array $visited): ?Type
     {
-        if (!array_key_exists($id, $definitions)) {
-            return $this->configValueTypeResolver->resolveClassType($id);
-        }
-
         $definition = $definitions[$id];
         if ($this->isCallableDefinition($definition)) {
             return $this->resolveCallableType($definition);
@@ -106,13 +132,11 @@ final class ContainerDefinitionAnalyzer
         }
 
         $class = $this->resolveDefinitionClass($id, $definition);
-        if ($class === null || isset($visited[$id])) {
+        if ($class === null || $class === $id || isset($visited[$id])) {
             return null;
         }
 
-        return $class === $id
-            ? $this->configValueTypeResolver->resolveClassType($id)
-            : $this->resolveDefinitionType($class, $definitions, $visited + [$id => true]);
+        return $this->resolveNamedType($class, $definitions, $visited + [$id => true]);
     }
 
     /**

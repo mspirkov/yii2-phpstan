@@ -37,8 +37,8 @@ final class ApplicationPropertyExpressionTypeResolverExtension implements Expres
 
         $name = $expr->name->toString();
         $type = $name === 'params'
-            ? $this->applicationConfigAnalyzer->resolveParamsType($scope->getNamespace())
-            : $this->applicationConfigAnalyzer->resolveComponentType($name, $scope->getNamespace());
+            ? $this->applicationConfigAnalyzer->resolveParamsType($scope)
+            : $this->applicationConfigAnalyzer->resolveComponentType($name, $scope);
 
         return $type !== null && $this->yiiAppAnalyzer->isPropertyFetch($expr->var, $scope) ? $type : null;
     }

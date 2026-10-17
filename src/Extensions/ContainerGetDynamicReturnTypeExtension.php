@@ -55,7 +55,7 @@ final class ContainerGetDynamicReturnTypeExtension implements DynamicMethodRetur
 
         $types = [];
         foreach ($ids as $id) {
-            $type = $this->containerDefinitionAnalyzer->resolveType($id, $scope->getNamespace());
+            $type = $this->containerDefinitionAnalyzer->resolveType($id, $scope);
             if ($type === null) {
                 return null;
             }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Config;
 
-use MSpirkov\Yii2\PHPStan\Analyzers\NamespaceAnalyzer;
 use MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider;
 use PHPUnit\Framework\TestCase;
 use yii\base\InvalidConfigException;
@@ -29,31 +28,12 @@ final class ApplicationConfigProviderTest extends TestCase
         rmdir($this->directory);
     }
 
-    /**
-     * @dataProvider dataInvalidNamespaces
-     */
-    public function testKeyNotNamespace(string $namespace): void
+    public function testMissingPath(): void
     {
         $this->expectException(InvalidConfigException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Key "%s" of the "mspirkovYii2.applicationConfigs" parameter is not a namespace.',
-            $namespace
-        ));
+        $this->expectExceptionMessage('Path "missing/path" of the "mspirkovYii2.applicationConfigs" parameter does not exist.');
 
-        $this->createProvider([$namespace => []]);
-    }
-
-    /**
-     * @return iterable<string, array{string}>
-     */
-    public static function dataInvalidNamespaces(): iterable
-    {
-        yield 'directory' => ['frontend/controllers'];
-        yield 'absolute path' => ['/app/frontend'];
-        yield 'wildcard' => ['app\frontend\*'];
-        yield 'leading digit' => ['1frontend'];
-        yield 'empty segment' => ['app\\\\frontend'];
-        yield 'global namespace' => ['\\'];
+        $this->createProvider([['paths' => ['missing/path'], 'files' => []]]);
     }
 
     public function testMissingConfigFile(): void
@@ -61,7 +41,7 @@ final class ApplicationConfigProviderTest extends TestCase
         $this->expectException(InvalidConfigException::class);
         $this->expectExceptionMessage('Application config file "missing/config.php" does not exist.');
 
-        $this->createProvider(['app' => ['missing/config.php']])->findConfig('app\controllers');
+        $this->createProvider([['paths' => [], 'files' => ['missing/config.php']]])->getConfigs();
     }
 
     public function testConfigFileNotReturningArray(): void
@@ -71,7 +51,7 @@ final class ApplicationConfigProviderTest extends TestCase
         $this->expectException(InvalidConfigException::class);
         $this->expectExceptionMessage(sprintf('Application config file "%s" must return an array.', $file));
 
-        $this->createProvider(['app' => [$file]])->findConfig('app');
+        $this->createProvider([['paths' => [], 'files' => [$file]]])->getConfigs();
     }
 
     public function testMissingBootstrapFile(): void
@@ -80,17 +60,48 @@ final class ApplicationConfigProviderTest extends TestCase
         $this->expectExceptionMessage('Bootstrap file "missing/bootstrap.php" does not exist.');
 
         $this->createProvider(
-            ['app' => [__DIR__ . '/Data/ApplicationConfigProvider/bootstrapped.php']],
+            [['paths' => [], 'files' => [__DIR__ . '/Data/ApplicationConfigProvider/bootstrapped.php']]],
             ['missing/bootstrap.php']
-        )->findConfig('app');
+        )->getConfigs();
     }
 
     public function testBootstrapFilesLoadedBeforeConfigs(): void
     {
         $directory = __DIR__ . '/Data/ApplicationConfigProvider';
-        $provider = $this->createProvider(['app' => [$directory . '/bootstrapped.php']], [$directory . '/bootstrap.php']);
+        $provider = $this->createProvider(
+            [['paths' => [], 'files' => [$directory . '/bootstrapped.php']]],
+            [$directory . '/bootstrap.php']
+        );
 
-        self::assertSame(['basePath' => $directory], $provider->findConfig('app'));
+        self::assertSame([['basePath' => $directory]], $provider->getConfigs());
+    }
+
+    public function testFindConfigs(): void
+    {
+        $directory = __DIR__ . '/Data/ApplicationConfigProvider/paths';
+        $provider = $this->createProvider([
+            [
+                'paths' => [$directory . '/backend', $directory . '/common', $directory . '/frontend-legacy/config.php'],
+                'files' => [$directory . '/backend/main.php'],
+            ],
+            [
+                'paths' => [$directory . '/frontend', $directory . '/common'],
+                'files' => [$directory . '/frontend/main.php'],
+            ],
+            [
+                'paths' => [$directory . '/frontend/api'],
+                'files' => [$directory . '/frontend/api/main.php'],
+            ],
+        ]);
+
+        self::assertSame([['id' => 'backend']], $provider->findConfigs($directory . '/backend/main.php'));
+        self::assertSame([['id' => 'backend'], ['id' => 'frontend']], $provider->findConfigs($directory . '/common/params.php'));
+        self::assertSame([['id' => 'frontend']], $provider->findConfigs($directory . '/frontend/main.php'));
+        self::assertSame([['id' => 'api']], $provider->findConfigs($directory . '/frontend/api/main.php'));
+        self::assertSame([['id' => 'api']], $provider->findConfigs($directory . '/frontend/../frontend/api/main.php'));
+        self::assertSame([['id' => 'backend']], $provider->findConfigs($directory . '/frontend-legacy/config.php'));
+        self::assertSame([], $provider->findConfigs($directory . '/frontend-legacy/code.php'));
+        self::assertSame([['id' => 'frontend']], $provider->findConfigs($directory . '/frontend/missing/code.php'));
     }
 
     public function testHashTracksIncludedFiles(): void
@@ -98,11 +109,11 @@ final class ApplicationConfigProviderTest extends TestCase
         file_put_contents($this->directory . '/main.php', "<?php\n\nreturn ['container' => require __DIR__ . '/container.php'];\n");
         file_put_contents($this->directory . '/container.php', "<?php\n\nreturn ['definitions' => []];\n");
 
-        $provider = $this->createProvider(['app' => [$this->directory . '/main.php']]);
+        $provider = $this->createProvider([['paths' => [$this->directory], 'files' => [$this->directory . '/main.php']]]);
         $hash = $provider->getHash();
 
         self::assertSame('mspirkovYii2.applicationConfigs', $provider->getKey());
-        self::assertSame(['container' => ['definitions' => []]], $provider->findConfig('app'));
+        self::assertSame([['container' => ['definitions' => []]]], $provider->findConfigs($this->directory . '/main.php'));
         self::assertSame($hash, $provider->getHash());
 
         file_put_contents($this->directory . '/container.php', "<?php\n\nreturn ['definitions' => ['foo' => 'bar']];\n");
@@ -111,11 +122,11 @@ final class ApplicationConfigProviderTest extends TestCase
     }
 
     /**
-     * @param array<string, list<string>> $applicationConfigs
+     * @param list<array{paths: list<string>, files: list<string>}> $applicationConfigs
      * @param list<string> $bootstrapFiles
      */
     private function createProvider(array $applicationConfigs, array $bootstrapFiles = []): ApplicationConfigProvider
     {
-        return new ApplicationConfigProvider($applicationConfigs, $bootstrapFiles, new NamespaceAnalyzer());
+        return new ApplicationConfigProvider($applicationConfigs, $bootstrapFiles);
     }
 }

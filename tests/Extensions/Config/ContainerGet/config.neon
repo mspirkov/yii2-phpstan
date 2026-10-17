@@ -1,16 +1,28 @@
 parameters:
 	mspirkovYii2:
 		applicationConfigs:
-			'app\backend':
-				- tests/Extensions/Data/ContainerGet/backend/config/main.php
-			'\app\common\':
-				- tests/Extensions/Data/ContainerGet/common/config/main.php
-				- tests/Extensions/Data/ContainerGet/common/config/main-local.php
-			'app\frontend':
-				- tests/Extensions/Data/ContainerGet/common/config/main.php
-				- tests/Extensions/Data/ContainerGet/common/config/main-local.php
-				- tests/Extensions/Data/ContainerGet/frontend/config/main.php
-			'app\frontend\modules\api':
-				- tests/Extensions/Data/ContainerGet/common/config/main.php
-				- tests/Extensions/Data/ContainerGet/frontend/config/main.php
-				- tests/Extensions/Data/ContainerGet/frontend/modules/api/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/ContainerGet/backend
+				files:
+					- tests/Extensions/Data/ContainerGet/backend/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/ContainerGet/common
+				files:
+					- tests/Extensions/Data/ContainerGet/common/config/main.php
+					- tests/Extensions/Data/ContainerGet/common/config/main-local.php
+			-
+				paths:
+					- tests/Extensions/Data/ContainerGet/frontend
+				files:
+					- tests/Extensions/Data/ContainerGet/common/config/main.php
+					- tests/Extensions/Data/ContainerGet/common/config/main-local.php
+					- tests/Extensions/Data/ContainerGet/frontend/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/ContainerGet/frontend/modules/api
+				files:
+					- tests/Extensions/Data/ContainerGet/common/config/main.php
+					- tests/Extensions/Data/ContainerGet/frontend/config/main.php
+					- tests/Extensions/Data/ContainerGet/frontend/modules/api/config/main.php

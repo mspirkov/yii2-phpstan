@@ -7,9 +7,19 @@ use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\ClockFactory;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Logger;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Mailer;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaymentGatewayInterface;
+use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaypalGateway;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\StripeGateway;
 
+use function PHPStan\Testing\assertType;
+
 return [
+    'on beforeRequest' => static function (): void {
+        assertType(PaypalGateway::class . '|' . StripeGateway::class, Yii::$app->payments);
+        assertType(PaypalGateway::class . '|' . StripeGateway::class, Yii::$app->get('payments'));
+        assertType(Mailer::class, Yii::$app->mailer);
+        assertType('object', Yii::$app->get('frontendOnly'));
+        assertType('string', Yii::$app->params['adminEmail']);
+    },
     'container' => [
         'definitions' => [
             PaymentGatewayInterface::class => StripeGateway::class,
@@ -17,7 +27,8 @@ return [
         ],
     ],
     'components' => [
-        'payments' => ['class' => PaymentGatewayInterface::class],
+        'payments' => ['class' => StripeGateway::class],
+        'gateway' => ['class' => PaymentGatewayInterface::class],
         'mailer' => ['class' => Mailer::class],
         'user' => ['identityClass' => 'app\models\User'],
         'logger' => 'logger.default',
