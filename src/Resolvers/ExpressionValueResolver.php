@@ -10,6 +10,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
+use PHPStan\Type\Constant\ConstantStringType;
 
 final class ExpressionValueResolver
 {
@@ -50,6 +51,17 @@ final class ExpressionValueResolver
         }
 
         return $constantStrings[0]->getValue();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getStringValues(Expr $expr, Scope $scope): array
+    {
+        return array_map(
+            static fn(ConstantStringType $type): string => $type->getValue(),
+            $scope->getType($expr)->getConstantStrings()
+        );
     }
 
     public function isFunctionCallNamed(FuncCall $funcCall, string $name): bool

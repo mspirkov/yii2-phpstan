@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSpirkov\Yii2\PHPStan\Extensions;
 
 use MSpirkov\Yii2\PHPStan\Analyzers\ContainerDefinitionAnalyzer;
+use MSpirkov\Yii2\PHPStan\Resolvers\ExpressionValueResolver;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -17,9 +18,14 @@ final class ContainerGetDynamicReturnTypeExtension implements DynamicMethodRetur
 {
     private ContainerDefinitionAnalyzer $containerDefinitionAnalyzer;
 
-    public function __construct(ContainerDefinitionAnalyzer $containerDefinitionAnalyzer)
-    {
+    private ExpressionValueResolver $expressionValueResolver;
+
+    public function __construct(
+        ContainerDefinitionAnalyzer $containerDefinitionAnalyzer,
+        ExpressionValueResolver $expressionValueResolver
+    ) {
         $this->containerDefinitionAnalyzer = $containerDefinitionAnalyzer;
+        $this->expressionValueResolver = $expressionValueResolver;
     }
 
     public function getClass(): string
@@ -42,14 +48,14 @@ final class ContainerGetDynamicReturnTypeExtension implements DynamicMethodRetur
             return null;
         }
 
-        $ids = $scope->getType($idArg->value)->getConstantStrings();
+        $ids = $this->expressionValueResolver->getStringValues($idArg->value, $scope);
         if ($ids === []) {
             return null;
         }
 
         $types = [];
         foreach ($ids as $id) {
-            $type = $this->containerDefinitionAnalyzer->resolveType($id->getValue(), $scope);
+            $type = $this->containerDefinitionAnalyzer->resolveType($id, $scope->getNamespace());
             if ($type === null) {
                 return null;
             }
