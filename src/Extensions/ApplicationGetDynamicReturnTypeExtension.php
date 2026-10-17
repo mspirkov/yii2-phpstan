@@ -55,7 +55,7 @@ final class ApplicationGetDynamicReturnTypeExtension implements DynamicMethodRet
 
         $types = [];
         foreach ($ids as $id) {
-            $type = $this->applicationConfigAnalyzer->resolveComponentType($id, $scope->getNamespace());
+            $type = $this->applicationConfigAnalyzer->resolveComponentType($id, $scope);
             if ($type === null) {
                 return null;
             }

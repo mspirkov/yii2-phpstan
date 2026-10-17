@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\frontend\controllers;
 
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Logger;
+use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaymentGatewayInterface;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaypalGateway;
 use Yii;
 use yii\base\Module;
@@ -15,6 +16,7 @@ use function PHPStan\Testing\assertType;
 function resolved(Application $app, bool $flag): void
 {
     assertType(PaypalGateway::class, $app->get('payments'));
+    assertType(PaymentGatewayInterface::class, $app->get('gateway'));
     assertType(PaypalGateway::class, Yii::$app->get('payments'));
     assertType(PaypalGateway::class, $app->get('payments', false));
     assertType(Logger::class . '|' . PaypalGateway::class, $app->get($flag ? 'payments' : 'logger'));

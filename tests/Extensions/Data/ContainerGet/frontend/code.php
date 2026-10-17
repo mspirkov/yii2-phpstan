@@ -13,7 +13,7 @@ use function PHPStan\Testing\assertType;
 
 function frontend(Container $container): void
 {
-    assertType(FrontendMailer::class, $container->get(MailerInterface::class));
-    assertType(FrontendMailer::class, $container->get('mailer'));
+    assertType(FrontendMailer::class, $container->get('mailer.default'));
+    assertType(MailerInterface::class, $container->get('mailer'));
     assertType(FileLogger::class, $container->get('logger'));
 }

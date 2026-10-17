@@ -17,6 +17,7 @@ return [
         'definitions' => [
             MailerInterface::class => Mailer::class,
             'mailer' => MailerInterface::class,
+            'mailer.default' => Mailer::class,
             'mailer.instance' => Instance::of('mailer'),
             'logger' => ['class' => Logger::class, 'level' => 1],
             'logger.legacy' => ['__class' => Logger::class],

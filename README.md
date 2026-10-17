@@ -50,6 +50,41 @@ All rules are on by default. Turn the whole set off, turn off just one of the tw
 ```neon
 parameters:
     mspirkovYii2:
+        # Application configs for the type extensions. The files of an entry are merged with
+        # ArrayHelper::merge() in order and apply to the code in its paths (directories or files, the most
+        # specific one wins). Here for yii2-app-advanced:
+        applicationConfigs:
+            -
+                paths:
+                    - %currentWorkingDirectory%/backend
+                files:
+                    - %currentWorkingDirectory%/common/config/main.php
+                    - %currentWorkingDirectory%/common/config/main-local.php
+                    - %currentWorkingDirectory%/backend/config/main.php
+                    - %currentWorkingDirectory%/backend/config/main-local.php
+            -
+                paths:
+                    - %currentWorkingDirectory%/common
+                files:
+                    - %currentWorkingDirectory%/common/config/main.php
+                    - %currentWorkingDirectory%/common/config/main-local.php
+            -
+                paths:
+                    - %currentWorkingDirectory%/console
+                files:
+                    - %currentWorkingDirectory%/common/config/main.php
+                    - %currentWorkingDirectory%/common/config/main-local.php
+                    - %currentWorkingDirectory%/console/config/main.php
+                    - %currentWorkingDirectory%/console/config/main-local.php
+            -
+                paths:
+                    - %currentWorkingDirectory%/frontend
+                files:
+                    - %currentWorkingDirectory%/common/config/main.php
+                    - %currentWorkingDirectory%/common/config/main-local.php
+                    - %currentWorkingDirectory%/frontend/config/main.php
+                    - %currentWorkingDirectory%/frontend/config/main-local.php
+
         # Master switch — false disables every rule below
         enableAllRules: false
 
@@ -75,29 +110,6 @@ parameters:
         # The controller ID is appended: `SiteController` reads `resources/frontend/views/site/*`.
         viewPaths:
             'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
-
-        # Application configs for the type extensions, keyed by the namespace of the code they apply to
-        # (sub-namespaces included, the most specific one wins). The files of a namespace are merged
-        # with ArrayHelper::merge() in order. Here for yii2-app-advanced with its code under app\*:
-        applicationConfigs:
-            'app\backend':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/backend/config/main.php
-                - %currentWorkingDirectory%/backend/config/main-local.php
-            'app\common':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-            'app\console':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/console/config/main.php
-                - %currentWorkingDirectory%/console/config/main-local.php
-            'app\frontend':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/frontend/config/main.php
-                - %currentWorkingDirectory%/frontend/config/main-local.php
 
         # Component IDs treated as "the database" by the DB-access rules
         yiiAppDbProperties:
@@ -153,27 +165,29 @@ parameters:
 
 ## Type extensions
 
-The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its namespace. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
+The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its `paths`, config files and views included. The most specific path wins, and code in a path listed in several configs gets a type only when all of them define it, as the union of their types. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A path or config file that is missing, or a config file that doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
 
 ### `Container::get()` return type
 
-Resolves a constant ID through `container.definitions` and `container.singletons`: classes, aliases, `Instance::of()`, `['class' => ...]` arrays, objects, and factories by their declared return type.
+Resolves a constant string ID through `container.definitions` and `container.singletons`: to the class its definition names, directly or in a `['class' => ...]` array, to the class of an object, to the declared return type of a factory, or through another ID or `Instance::of()` it points to. A named class isn't followed further to the implementation the container maps it to, and an ID that is a class keeps the class Yii declares for it, so code that asks for an interface keeps depending on the interface.
 
 ```php
 'container' => [
     'definitions' => [
         MailerInterface::class => SmtpMailer::class,
         'mailer' => MailerInterface::class,
+        'mailer.smtp' => ['class' => SmtpMailer::class],
     ],
 ],
 
-Yii::$container->get(MailerInterface::class); // SmtpMailer instead of MailerInterface
-Yii::$container->get('mailer');               // SmtpMailer instead of object
+Yii::$container->get('mailer');               // MailerInterface instead of object
+Yii::$container->get('mailer.smtp');          // SmtpMailer instead of object
+Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
 ```
 
 ### `Yii::$app` components
 
-Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` from `components`, following the class through the container definitions the way `Yii::createObject()` does. A component defined in any config is known everywhere: outside the namespaces of its configs, e.g. in view files, it resolves to the union of its types across them.
+Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` from `components`, the same way: to the class the component names, or through the container definitions when it names an ID. A component defined in any config is known everywhere: outside the paths of its configs it resolves to the union of its types across them.
 
 ```php
 'components' => [
@@ -189,6 +203,8 @@ Yii::$app->get('payments'); // StripeGateway instead of object
 ### `Yii::$app->params`
 
 Resolves to an array shape with the keys of `params` and their values generalized to types, since the values usually differ between environments.
+
+PHPStan 2.3 seems to have a bug here: `isset()` and `??` directly on `Yii::$app->params[...]` narrow the declared `array` type of the property instead of the resolved shape, so the result is `mixed`. Reading the params into a variable first keeps the shape.
 
 ```php
 'params' => [

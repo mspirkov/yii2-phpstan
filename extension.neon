@@ -111,7 +111,10 @@ parametersSchema:
 		aliases: arrayOf(string())
 		viewExtensions: listOf(string())
 		viewPaths: arrayOf(string())
-		applicationConfigs: arrayOf(listOf(string()), string())
+		applicationConfigs: listOf(structure([
+			paths: listOf(string())
+			files: listOf(string())
+		]))
 		actionComplexity: structure([
 			ifCount: int()
 			foreachCount: int()

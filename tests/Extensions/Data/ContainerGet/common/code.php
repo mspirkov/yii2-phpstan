@@ -17,15 +17,13 @@ use function PHPStan\Testing\assertType;
 
 function resolved(Container $container): void
 {
-    assertType(Mailer::class, $container->get(MailerInterface::class));
-    assertType(Mailer::class, Yii::$container->get(MailerInterface::class));
-    assertType(Mailer::class, $container->get('mailer'));
-    assertType(Mailer::class, $container->get('mailer.instance'));
+    assertType(MailerInterface::class, $container->get('mailer'));
+    assertType(MailerInterface::class, $container->get('mailer.instance'));
+    assertType(Mailer::class, $container->get('mailer.default'));
+    assertType(Mailer::class, Yii::$container->get('mailer.default'));
     assertType(FileLogger::class, $container->get('logger'));
     assertType(Logger::class, $container->get('logger.legacy'));
     assertType(Logger::class, $container->get('logger.withParams'));
-    assertType(Logger::class, $container->get(Logger::class));
-    assertType(FileLogger::class, $container->get(FileLogger::class));
     assertType(FileLogger::class, $container->get('logger.shared'));
     assertType(Clock::class, $container->get('clock'));
     assertType(Clock::class . '|null', $container->get('clock.nullable'));
@@ -39,7 +37,7 @@ function resolved(Container $container): void
 
 function unions(Container $container, bool $flag): void
 {
-    assertType(FileLogger::class . '|' . Mailer::class, $container->get($flag ? 'mailer' : 'logger'));
+    assertType(FileLogger::class . '|' . Mailer::class, $container->get($flag ? 'mailer.default' : 'logger'));
     assertType('object', $container->get($flag ? 'mailer' : 'untyped'));
 }
 
@@ -59,6 +57,10 @@ function skipped(Container $container, string $id): void
     assertType('object', $container->get('invalidType'));
     assertType('object', $container->get('empty'));
     assertType('object', $container->get('undefined'));
+    assertType(MailerInterface::class, $container->get(MailerInterface::class));
+    assertType(MailerInterface::class, Yii::$container->get(MailerInterface::class));
+    assertType(Logger::class, $container->get(Logger::class));
+    assertType(FileLogger::class, $container->get(FileLogger::class));
     assertType(ClockFactory::class, $container->get(ClockFactory::class));
     assertType('object', $container->get($id));
     assertType('object', $container->get());

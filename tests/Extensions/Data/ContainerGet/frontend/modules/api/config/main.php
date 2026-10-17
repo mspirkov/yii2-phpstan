@@ -9,6 +9,7 @@ return [
     'container' => [
         'definitions' => [
             MailerInterface::class => ApiMailer::class,
+            'mailer.default' => ApiMailer::class,
         ],
     ],
 ];

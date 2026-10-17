@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace MSpirkov\Yii2\PHPStan\Config;
 
-use MSpirkov\Yii2\PHPStan\Analyzers\NamespaceAnalyzer;
 use PHPStan\Analyser\ResultCache\ResultCacheMetaExtension;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 
 final class ApplicationConfigProvider implements ResultCacheMetaExtension
 {
-    private const NAMESPACE_PATTERN = '/^[A-Za-z_\x80-\xff][\w\x80-\xff]*(?:\\\\[A-Za-z_\x80-\xff][\w\x80-\xff]*)*$/';
-
-    /** @var array<string, list<string>> */
+    /** @var list<array{paths: list<string>, files: list<string>}> */
     private array $applicationConfigs = [];
 
     /** @var list<string> */
     private array $bootstrapFiles;
 
-    private NamespaceAnalyzer $namespaceAnalyzer;
-
-    /** @var array<string, array<mixed>> */
+    /** @var array<int, array<mixed>> */
     private array $mergedConfigs = [];
 
     /** @var array<string, array<mixed>> */
@@ -30,51 +25,53 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
     /** @var array<string, true> */
     private array $includedFiles = [];
 
+    /** @var array<string, list<int>> */
+    private array $fileConfigIndexes = [];
+
     /**
-     * @param array<string, list<string>> $applicationConfigs
+     * @param list<array{paths: list<string>, files: list<string>}> $applicationConfigs
      * @param list<string> $bootstrapFiles
      */
-    public function __construct(
-        array $applicationConfigs,
-        array $bootstrapFiles,
-        NamespaceAnalyzer $namespaceAnalyzer
-    ) {
-        foreach ($applicationConfigs as $namespace => $files) {
-            $normalizedNamespace = trim($namespace, '\\');
-            if (preg_match(self::NAMESPACE_PATTERN, $normalizedNamespace) !== 1) {
-                throw new InvalidConfigException(sprintf(
-                    'Key "%s" of the "mspirkovYii2.applicationConfigs" parameter is not a namespace. Use the namespace of the code the configs apply to, e.g. "app\frontend".',
-                    $namespace
-                ));
+    public function __construct(array $applicationConfigs, array $bootstrapFiles)
+    {
+        foreach ($applicationConfigs as $applicationConfig) {
+            $paths = [];
+            foreach ($applicationConfig['paths'] as $path) {
+                $realPath = realpath($path);
+                if ($realPath === false) {
+                    throw new InvalidConfigException(sprintf(
+                        'Path "%s" of the "mspirkovYii2.applicationConfigs" parameter does not exist.',
+                        $path
+                    ));
+                }
+
+                $paths[] = $realPath;
             }
 
-            $this->applicationConfigs[$normalizedNamespace] = $files;
+            $this->applicationConfigs[] = ['paths' => $paths, 'files' => $applicationConfig['files']];
         }
 
         $this->bootstrapFiles = $bootstrapFiles;
-        $this->namespaceAnalyzer = $namespaceAnalyzer;
     }
 
     /**
-     * @return array<mixed>|null
+     * @return list<array<mixed>>
      */
-    public function findConfig(?string $namespace): ?array
+    public function findConfigs(string $file): array
     {
-        if ($namespace === null) {
-            return null;
+        if (!isset($this->fileConfigIndexes[$file])) {
+            $this->fileConfigIndexes[$file] = $this->findConfigIndexes($file);
         }
 
-        $configuredNamespace = $this->namespaceAnalyzer->findClosestNamespace($namespace, $this->getNamespaces());
-
-        return $configuredNamespace === null ? null : $this->getConfig($configuredNamespace);
+        return array_map(fn(int $index): array => $this->getConfig($index), $this->fileConfigIndexes[$file]);
     }
 
     /**
-     * @return list<string>
+     * @return list<array<mixed>>
      */
-    public function getNamespaces(): array
+    public function getConfigs(): array
     {
-        return array_keys($this->applicationConfigs);
+        return array_map(fn(int $index): array => $this->getConfig($index), array_keys($this->applicationConfigs));
     }
 
     public function getKey(): string
@@ -84,9 +81,7 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
 
     public function getHash(): string
     {
-        foreach (array_keys($this->applicationConfigs) as $namespace) {
-            $this->getConfig($namespace);
-        }
+        $this->getConfigs();
 
         $files = array_keys($this->includedFiles);
         sort($files);
@@ -98,20 +93,52 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
     }
 
     /**
+     * @return list<int>
+     */
+    private function findConfigIndexes(string $file): array
+    {
+        $realPath = realpath($file);
+        $file = $realPath === false ? $file : $realPath;
+
+        $indexes = [];
+        $longestLength = 0;
+        foreach ($this->applicationConfigs as $index => $applicationConfig) {
+            foreach ($applicationConfig['paths'] as $path) {
+                $length = strlen($path);
+                if (
+                    $length < $longestLength
+                    || ($file !== $path && strncmp($file, $path . DIRECTORY_SEPARATOR, $length + 1) !== 0)
+                ) {
+                    continue;
+                }
+
+                if ($length > $longestLength) {
+                    $indexes = [];
+                    $longestLength = $length;
+                }
+
+                $indexes[$index] = $index;
+            }
+        }
+
+        return array_values($indexes);
+    }
+
+    /**
      * @return array<mixed>
      */
-    private function getConfig(string $namespace): array
+    private function getConfig(int $index): array
     {
-        if (!isset($this->mergedConfigs[$namespace])) {
+        if (!isset($this->mergedConfigs[$index])) {
             $config = [];
-            foreach ($this->applicationConfigs[$namespace] as $file) {
+            foreach ($this->applicationConfigs[$index]['files'] as $file) {
                 $config = ArrayHelper::merge($config, $this->loadFile($file));
             }
 
-            $this->mergedConfigs[$namespace] = $config;
+            $this->mergedConfigs[$index] = $config;
         }
 
-        return $this->mergedConfigs[$namespace];
+        return $this->mergedConfigs[$index];
     }
 
     /**
