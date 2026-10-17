@@ -374,6 +374,18 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Rules\NoYiiAppPropertyMutationRule
 
 	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\ApplicationComponentPropertiesClassReflectionExtension
+		tags:
+			- phpstan.broker.propertiesClassReflectionExtension
+	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\ApplicationGetDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\ApplicationPropertyExpressionTypeResolverExtension
+		tags:
+			- phpstan.broker.expressionTypeResolverExtension
+	-
 		class: MSpirkov\Yii2\PHPStan\Extensions\ContainerGetDynamicReturnTypeExtension
 		tags:
 			- phpstan.broker.dynamicMethodReturnTypeExtension
@@ -411,6 +423,8 @@ services:
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ComponentObjectConfigAnalyzer
 	-
+		class: MSpirkov\Yii2\PHPStan\Analyzers\ApplicationConfigAnalyzer
+	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ContainerDefinitionAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ControllerActionAnalyzer
@@ -434,6 +448,8 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Finders\MethodReturnExpressionFinder
 	-
 		class: MSpirkov\Yii2\PHPStan\Visitors\MethodReturnExpressionVisitor
+	-
+		class: MSpirkov\Yii2\PHPStan\Resolvers\ConfigValueTypeResolver
 	-
 		class: MSpirkov\Yii2\PHPStan\Resolvers\ExpressionValueResolver
 	-

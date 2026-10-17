@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace app\common\components;
 
+use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\ClockFactory;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Logger;
+use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\MailerInterface;
 use Yii;
 use yii\di\Container;
@@ -15,29 +17,29 @@ use function PHPStan\Testing\assertType;
 
 function resolved(Container $container): void
 {
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer', $container->get(MailerInterface::class));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer', Yii::$container->get(MailerInterface::class));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer', $container->get('mailer'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer', $container->get('mailer.instance'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger', $container->get('logger'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Logger', $container->get('logger.legacy'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Logger', $container->get('logger.withParams'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Logger', $container->get(Logger::class));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger', $container->get(FileLogger::class));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger', $container->get('logger.shared'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock|null', $container->get('clock.nullable'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock.factory'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock.factoryInstance'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock|null', $container->get('clock.nullableFactory'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock.invokable'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock.instance'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Clock', $container->get('clock.overridden'));
+    assertType(Mailer::class, $container->get(MailerInterface::class));
+    assertType(Mailer::class, Yii::$container->get(MailerInterface::class));
+    assertType(Mailer::class, $container->get('mailer'));
+    assertType(Mailer::class, $container->get('mailer.instance'));
+    assertType(FileLogger::class, $container->get('logger'));
+    assertType(Logger::class, $container->get('logger.legacy'));
+    assertType(Logger::class, $container->get('logger.withParams'));
+    assertType(Logger::class, $container->get(Logger::class));
+    assertType(FileLogger::class, $container->get(FileLogger::class));
+    assertType(FileLogger::class, $container->get('logger.shared'));
+    assertType(Clock::class, $container->get('clock'));
+    assertType(Clock::class . '|null', $container->get('clock.nullable'));
+    assertType(Clock::class, $container->get('clock.factory'));
+    assertType(Clock::class, $container->get('clock.factoryInstance'));
+    assertType(Clock::class . '|null', $container->get('clock.nullableFactory'));
+    assertType(Clock::class, $container->get('clock.invokable'));
+    assertType(Clock::class, $container->get('clock.instance'));
+    assertType(Clock::class, $container->get('clock.overridden'));
 }
 
 function unions(Container $container, bool $flag): void
 {
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger|MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer', $container->get($flag ? 'mailer' : 'logger'));
+    assertType(FileLogger::class . '|' . Mailer::class, $container->get($flag ? 'mailer' : 'logger'));
     assertType('object', $container->get($flag ? 'mailer' : 'untyped'));
 }
 
@@ -57,7 +59,7 @@ function skipped(Container $container, string $id): void
     assertType('object', $container->get('invalidType'));
     assertType('object', $container->get('empty'));
     assertType('object', $container->get('undefined'));
-    assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\ClockFactory', $container->get(ClockFactory::class));
+    assertType(ClockFactory::class, $container->get(ClockFactory::class));
     assertType('object', $container->get($id));
     assertType('object', $container->get());
     assertType('bool', $container->has('mailer'));

@@ -1,0 +1,11 @@
+parameters:
+	mspirkovYii2:
+		applicationConfigs:
+			'app\backend':
+				- tests/Extensions/Data/Application/common/config/main.php
+				- tests/Extensions/Data/Application/backend/config/main.php
+			'app\console':
+				- tests/Extensions/Data/Application/console/config/main.php
+			'app\frontend':
+				- tests/Extensions/Data/Application/common/config/main.php
+				- tests/Extensions/Data/Application/frontend/config/main.php

@@ -58,12 +58,17 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
             return null;
         }
 
-        $configuredNamespace = $this->namespaceAnalyzer->findClosestNamespace(
-            $namespace,
-            array_keys($this->applicationConfigs)
-        );
+        $configuredNamespace = $this->namespaceAnalyzer->findClosestNamespace($namespace, $this->getNamespaces());
 
         return $configuredNamespace === null ? null : $this->getConfig($configuredNamespace);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getNamespaces(): array
+    {
+        return array_keys($this->applicationConfigs);
     }
 
     public function getKey(): string

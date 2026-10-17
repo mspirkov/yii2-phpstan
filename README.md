@@ -76,12 +76,28 @@ parameters:
         viewPaths:
             'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
 
-        # Application configs for code in a namespace (and its sub-namespaces), merged in order,
-        # the most specific namespace wins. Used by the type extensions, see "Type extensions" below.
+        # Application configs for the type extensions, keyed by the namespace of the code they apply to
+        # (sub-namespaces included, the most specific one wins). The files of a namespace are merged
+        # with ArrayHelper::merge() in order. Here for yii2-app-advanced with its code under app\*:
         applicationConfigs:
+            'app\backend':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+                - %currentWorkingDirectory%/backend/config/main.php
+                - %currentWorkingDirectory%/backend/config/main-local.php
+            'app\common':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+            'app\console':
+                - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
+                - %currentWorkingDirectory%/console/config/main.php
+                - %currentWorkingDirectory%/console/config/main-local.php
             'app\frontend':
                 - %currentWorkingDirectory%/common/config/main.php
+                - %currentWorkingDirectory%/common/config/main-local.php
                 - %currentWorkingDirectory%/frontend/config/main.php
+                - %currentWorkingDirectory%/frontend/config/main-local.php
 
         # Component IDs treated as "the database" by the DB-access rules
         yiiAppDbProperties:
@@ -137,60 +153,52 @@ parameters:
 
 ## Type extensions
 
+The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its namespace. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
+
 ### `Container::get()` return type
 
-Out of the box, PHPStan types `Yii::$container->get()` as the requested class for a class name and as a plain `object` for anything else, so an alias like `'mailer'` loses its type, and an interface bound to a concrete class resolves only to the interface. This extension reads the container definitions (`container.definitions` and `container.singletons`) from your application configs and resolves `Container::get()` with a constant ID to the class that the definition leads to.
-
-Configs are set under `mspirkovYii2.applicationConfigs`, keyed by the namespace of the code they apply to. The most specific namespace wins, so `app\frontend\modules\api` takes precedence over `app\frontend` for code in that module. The files listed for a namespace are merged with `ArrayHelper::merge()` in the given order, the same way an entry script builds the application config. For a project based on [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced) with its code under the `app\backend`, `app\common`, `app\console` and `app\frontend` namespaces:
-
-```neon
-parameters:
-    mspirkovYii2:
-        applicationConfigs:
-            'app\backend':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/backend/config/main.php
-                - %currentWorkingDirectory%/backend/config/main-local.php
-            'app\common':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-            'app\console':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/console/config/main.php
-                - %currentWorkingDirectory%/console/config/main-local.php
-            'app\frontend':
-                - %currentWorkingDirectory%/common/config/main.php
-                - %currentWorkingDirectory%/common/config/main-local.php
-                - %currentWorkingDirectory%/frontend/config/main.php
-                - %currentWorkingDirectory%/frontend/config/main-local.php
-```
-
-Definitions are followed the way the container does it: class names, aliases (including chains of aliases), `Instance::of()`, `['class' => ...]` arrays and objects. Factories (closures, invokable objects and `[class, method]` arrays) resolve to their declared return type. When an ID can't be resolved, PHPStan's own `Container::get()` return type is kept. That covers a dynamic ID, an ID without a definition, a factory without a class return type, and a definition that leads to a missing class. Code outside the configured namespaces is left as is, including code without a namespace, such as view files.
+Resolves a constant ID through `container.definitions` and `container.singletons`: classes, aliases, `Instance::of()`, `['class' => ...]` arrays, objects, and factories by their declared return type.
 
 ```php
-// common/config/main.php
-return [
-    'container' => [
-        'definitions' => [
-            MailerInterface::class => SmtpMailer::class,
-            'mailer' => MailerInterface::class,
-            'clock' => static fn(): SystemClock => new SystemClock(),
-            'payments' => [PaymentGatewayFactory::class, 'create'],
-        ],
+'container' => [
+    'definitions' => [
+        MailerInterface::class => SmtpMailer::class,
+        'mailer' => MailerInterface::class,
     ],
-];
+],
 
-// frontend/controllers/SiteController.php, namespace app\frontend\controllers
 Yii::$container->get(MailerInterface::class); // SmtpMailer instead of MailerInterface
 Yii::$container->get('mailer');               // SmtpMailer instead of object
-Yii::$container->get('clock');                // SystemClock, the closure's return type
-Yii::$container->get('payments');             // the return type of PaymentGatewayFactory::create()
-Yii::$container->get($id);                    // object, the ID is not a constant
 ```
 
-The config files are executed during analysis, so everything they rely on (`Yii.php`, aliases, constants like `YII_ENV`, environment variables) has to be available, e.g. through `bootstrapFiles`. A key that isn't a namespace, or a config file that is missing or doesn't return an array, stops the analysis with an error. A change to any of the config files, or to the files they include, invalidates the result cache.
+### `Yii::$app` components
+
+Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` from `components`, following the class through the container definitions the way `Yii::createObject()` does. A component defined in any config is known everywhere: outside the namespaces of its configs, e.g. in view files, it resolves to the union of its types across them.
+
+```php
+'components' => [
+    'mailer' => ['class' => SymfonyMailer::class],
+    'payments' => ['class' => StripeGateway::class],
+],
+
+Yii::$app->mailer;          // SymfonyMailer instead of MailerInterface
+Yii::$app->payments;        // StripeGateway instead of an undefined property
+Yii::$app->get('payments'); // StripeGateway instead of object
+```
+
+### `Yii::$app->params`
+
+Resolves to an array shape with the keys of `params` and their values generalized to types, since the values usually differ between environments.
+
+```php
+'params' => [
+    'adminEmail' => 'admin@example.com',
+    'pageSize' => 20,
+],
+
+Yii::$app->params;             // array{adminEmail: string, pageSize: int}
+Yii::$app->params['pageSzie']; // ✗ Offset 'pageSzie' does not exist
+```
 
 ## Rules at a glance
 

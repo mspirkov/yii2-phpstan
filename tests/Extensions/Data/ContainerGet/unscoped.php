@@ -10,7 +10,7 @@ namespace app\console\controllers {
 
     function console(Container $container): void
     {
-        assertType('MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\MailerInterface', $container->get(MailerInterface::class));
+        assertType(MailerInterface::class, $container->get(MailerInterface::class));
         assertType('object', $container->get('mailer'));
     }
 }

@@ -6,43 +6,55 @@ namespace MSpirkov\Yii2\PHPStan\Analyzers;
 
 use Closure;
 use MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider;
-use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Type\ObjectType;
+use MSpirkov\Yii2\PHPStan\Resolvers\ConfigValueTypeResolver;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
-use ReflectionFunction;
-use ReflectionNamedType;
 use yii\di\Instance;
 
 final class ContainerDefinitionAnalyzer
 {
     private ApplicationConfigProvider $applicationConfigProvider;
 
-    private ReflectionProvider $reflectionProvider;
+    private ConfigValueTypeResolver $configValueTypeResolver;
 
     public function __construct(
         ApplicationConfigProvider $applicationConfigProvider,
-        ReflectionProvider $reflectionProvider
+        ConfigValueTypeResolver $configValueTypeResolver
     ) {
         $this->applicationConfigProvider = $applicationConfigProvider;
-        $this->reflectionProvider = $reflectionProvider;
+        $this->configValueTypeResolver = $configValueTypeResolver;
     }
 
-    public function resolveType(string $id, Scope $scope): ?Type
+    public function resolveType(string $id, ?string $namespace): ?Type
     {
-        $definitions = $this->getDefinitions($scope);
+        $definitions = $this->getDefinitions($namespace);
 
         return array_key_exists($id, $definitions) ? $this->resolveDefinitionType($id, $definitions, []) : null;
     }
 
     /**
+     * @param mixed $type
+     */
+    public function resolveCreateObjectType($type, ?string $namespace): ?Type
+    {
+        if (is_string($type)) {
+            return $this->resolveDefinitionType($type, $this->getDefinitions($namespace), []);
+        }
+
+        if ($this->isCallableDefinition($type)) {
+            return $this->resolveCallableType($type);
+        }
+
+        $class = is_array($type) ? $type['__class'] ?? $type['class'] ?? null : null;
+
+        return is_string($class) ? $this->resolveDefinitionType($class, $this->getDefinitions($namespace), []) : null;
+    }
+
+    /**
      * @return array<mixed>
      */
-    private function getDefinitions(Scope $scope): array
+    private function getDefinitions(?string $namespace): array
     {
-        $container = $this->applicationConfigProvider->findConfig($scope->getNamespace())['container'] ?? null;
+        $container = $this->applicationConfigProvider->findConfig($namespace)['container'] ?? null;
         if (!is_array($container)) {
             return [];
         }
@@ -81,25 +93,16 @@ final class ContainerDefinitionAnalyzer
     private function resolveDefinitionType(string $id, array $definitions, array $visited): ?Type
     {
         if (!array_key_exists($id, $definitions)) {
-            return $this->createObjectType($id);
+            return $this->configValueTypeResolver->resolveClassType($id);
         }
 
         $definition = $definitions[$id];
-        if ($definition instanceof Closure) {
-            return $this->resolveClosureType($definition);
+        if ($this->isCallableDefinition($definition)) {
+            return $this->resolveCallableType($definition);
         }
 
         if (is_object($definition) && !$definition instanceof Instance) {
-            return is_callable($definition)
-                ? $this->resolveMethodType(get_class($definition), '__invoke')
-                : $this->createObjectType(get_class($definition));
-        }
-
-        if (is_array($definition) && is_callable($definition, true)) {
-            return $this->resolveMethodType(
-                is_object($definition[0]) ? get_class($definition[0]) : $definition[0],
-                $definition[1]
-            );
+            return $this->configValueTypeResolver->resolveClassType(get_class($definition));
         }
 
         $class = $this->resolveDefinitionClass($id, $definition);
@@ -108,7 +111,7 @@ final class ContainerDefinitionAnalyzer
         }
 
         return $class === $id
-            ? $this->createObjectType($id)
+            ? $this->configValueTypeResolver->resolveClassType($id)
             : $this->resolveDefinitionType($class, $definitions, $visited + [$id => true]);
     }
 
@@ -139,43 +142,31 @@ final class ContainerDefinitionAnalyzer
     }
 
     /**
-     * @param Closure(mixed ...): mixed $closure
+     * @param mixed $definition
      */
-    private function resolveClosureType(Closure $closure): ?Type
+    private function isCallableDefinition($definition): bool
     {
-        $returnType = (new ReflectionFunction($closure))->getReturnType();
-        if (!$returnType instanceof ReflectionNamedType) {
-            return null;
-        }
-
-        $type = $this->createObjectType($returnType->getName());
-
-        return $type !== null && $returnType->allowsNull() ? TypeCombinator::addNull($type) : $type;
+        return !is_string($definition) && is_callable($definition, true);
     }
 
-    private function resolveMethodType(string $class, string $method): ?Type
+    /**
+     * @param mixed $callable
+     */
+    private function resolveCallableType($callable): ?Type
     {
-        if (!$this->reflectionProvider->hasClass($class)) {
-            return null;
+        if ($callable instanceof Closure) {
+            return $this->configValueTypeResolver->resolveClosureReturnType($callable);
         }
 
-        $classReflection = $this->reflectionProvider->getClass($class);
-        if (!$classReflection->hasNativeMethod($method)) {
-            return null;
+        if (is_object($callable)) {
+            return $this->configValueTypeResolver->resolveMethodReturnType(get_class($callable), '__invoke');
         }
 
-        $type = ParametersAcceptorSelector::combineAcceptors(
-            $classReflection->getNativeMethod($method)->getVariants()
-        )->getReturnType();
-        $objectType = TypeCombinator::removeNull($type);
-
-        return $objectType->isObject()->yes() && $objectType->getObjectClassNames() !== [] ? $type : null;
-    }
-
-    private function createObjectType(string $class): ?Type
-    {
-        return $this->reflectionProvider->hasClass($class)
-            ? new ObjectType($this->reflectionProvider->getClass($class)->getName())
+        return is_array($callable) && is_callable($callable, true)
+            ? $this->configValueTypeResolver->resolveMethodReturnType(
+                is_object($callable[0]) ? get_class($callable[0]) : $callable[0],
+                $callable[1]
+            )
             : null;
     }
 }
