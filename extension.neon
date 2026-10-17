@@ -456,5 +456,6 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider
 		arguments:
 			applicationConfigs: %mspirkovYii2.applicationConfigs%
+			bootstrapFiles: %bootstrapFiles%
 		tags:
 			- phpstan.resultCacheMetaExtension

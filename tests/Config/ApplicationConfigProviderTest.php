@@ -74,6 +74,25 @@ final class ApplicationConfigProviderTest extends TestCase
         $this->createProvider(['app' => [$file]])->findConfig('app');
     }
 
+    public function testMissingBootstrapFile(): void
+    {
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage('Bootstrap file "missing/bootstrap.php" does not exist.');
+
+        $this->createProvider(
+            ['app' => [__DIR__ . '/Data/ApplicationConfigProvider/bootstrapped.php']],
+            ['missing/bootstrap.php']
+        )->findConfig('app');
+    }
+
+    public function testBootstrapFilesLoadedBeforeConfigs(): void
+    {
+        $directory = __DIR__ . '/Data/ApplicationConfigProvider';
+        $provider = $this->createProvider(['app' => [$directory . '/bootstrapped.php']], [$directory . '/bootstrap.php']);
+
+        self::assertSame(['basePath' => $directory], $provider->findConfig('app'));
+    }
+
     public function testHashTracksIncludedFiles(): void
     {
         file_put_contents($this->directory . '/main.php', "<?php\n\nreturn ['container' => require __DIR__ . '/container.php'];\n");
@@ -93,9 +112,10 @@ final class ApplicationConfigProviderTest extends TestCase
 
     /**
      * @param array<string, list<string>> $applicationConfigs
+     * @param list<string> $bootstrapFiles
      */
-    private function createProvider(array $applicationConfigs): ApplicationConfigProvider
+    private function createProvider(array $applicationConfigs, array $bootstrapFiles = []): ApplicationConfigProvider
     {
-        return new ApplicationConfigProvider($applicationConfigs, new NamespaceAnalyzer());
+        return new ApplicationConfigProvider($applicationConfigs, $bootstrapFiles, new NamespaceAnalyzer());
     }
 }
