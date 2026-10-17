@@ -26,6 +26,7 @@ final class ApplicationPropertyExpressionTypeResolverExtensionTest extends TypeI
         yield 'frontend' => [__DIR__ . '/Data/Application/frontend/properties.php'];
         yield 'backend' => [__DIR__ . '/Data/Application/backend/properties.php'];
         yield 'common config' => [__DIR__ . '/Data/Application/common/config/main.php'];
+        yield 'shared module' => [__DIR__ . '/Data/Application/modules/shop/properties.php'];
     }
 
     public static function getAdditionalConfigFiles(): array

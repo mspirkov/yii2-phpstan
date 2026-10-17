@@ -4,10 +4,15 @@ parameters:
 			-
 				paths:
 					- tests/Extensions/Data/Application/backend
-					- tests/Extensions/Data/Application/common
+					- tests/Extensions/Data/Application/modules/shop
 				files:
 					- tests/Extensions/Data/Application/common/config/main.php
 					- tests/Extensions/Data/Application/backend/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/Application/common
+				files:
+					- tests/Extensions/Data/Application/common/config/main.php
 			-
 				paths:
 					- tests/Extensions/Data/Application/console
@@ -16,7 +21,7 @@ parameters:
 			-
 				paths:
 					- tests/Extensions/Data/Application/frontend
-					- tests/Extensions/Data/Application/common
+					- tests/Extensions/Data/Application/modules/shop
 				files:
 					- tests/Extensions/Data/Application/common/config/main.php
 					- tests/Extensions/Data/Application/frontend/config/main.php

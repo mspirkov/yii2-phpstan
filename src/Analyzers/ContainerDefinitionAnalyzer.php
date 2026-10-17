@@ -28,7 +28,6 @@ final class ContainerDefinitionAnalyzer
 
     public function resolveType(string $id, Scope $scope): ?Type
     {
-        // A class ID keeps the class Yii declares for it, not the implementation it's mapped to.
         if ($this->configValueTypeResolver->resolveClassType($id) !== null) {
             return null;
         }
@@ -105,15 +104,17 @@ final class ContainerDefinitionAnalyzer
     }
 
     /**
-     * A class name resolves to that class, an alias to the type of its definition.
-     *
      * @param array<mixed> $definitions
      * @param array<string, true> $visited
      */
     private function resolveNamedType(string $name, array $definitions, array $visited): ?Type
     {
-        return $this->configValueTypeResolver->resolveClassType($name)
-            ?? (array_key_exists($name, $definitions) ? $this->resolveDefinitionType($name, $definitions, $visited) : null);
+        $classType = $this->configValueTypeResolver->resolveClassType($name);
+        if ($classType !== null || !array_key_exists($name, $definitions)) {
+            return $classType;
+        }
+
+        return $this->resolveDefinitionType($name, $definitions, $visited);
     }
 
     /**
