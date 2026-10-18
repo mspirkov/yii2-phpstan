@@ -62,7 +62,7 @@ parameters:
 
 ### Application configs
 
-The [type extensions](#type-extensions) read types from these configs. The `files` of an entry are merged with `ArrayHelper::merge()` in order and apply to the code in its `paths` (directories or files, the most specific one wins). The files are executed during analysis, so load what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) through `bootstrapFiles`. For yii2-app-advanced:
+The [type extensions](#type-extensions) read types from these configs. The `files` of an entry are merged with `ArrayHelper::merge()` in order and apply to the code in its `paths` (directories or files, the most specific one wins). The files are executed during analysis, so load what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) through `bootstrapFiles`. For [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced):
 
 ```neon
 parameters:
@@ -102,7 +102,7 @@ parameters:
 
 ### `Yii::$app` types
 
-`yiiAppTypes` sets the type of `Yii::$app` for the code in the `paths` of an entry, matched as in `applicationConfigs`. `type` is a PHPDoc type, the one Yii declares when omitted, and `nullable: false` removes `null` from it. For yii2-app-advanced:
+`yiiAppTypes` sets the type of `Yii::$app` for the code in the `paths` of an entry, matched as in `applicationConfigs`. `type` is a PHPDoc type, the one Yii declares when omitted, and `nullable: false` removes `null` from it. For [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced):
 
 ```neon
 parameters:
@@ -222,7 +222,7 @@ Yii::$container->get('clock');                // SystemClock, inferred from the 
 
 ### `Yii::$app` type
 
-Gives `Yii::$app` the type set in [`yiiAppTypes`](#yiiapp-types), e.g. a custom application class or the identity class of the `user` component. With the yii2-app-advanced example from there:
+Gives `Yii::$app` the type set in [`yiiAppTypes`](#yiiapp-types), e.g. a custom application class or the identity class of the `user` component. With the [yii2-app-advanced](https://github.com/yiisoft/yii2-app-advanced) example from there:
 
 ```php
 // backend, frontend
