@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\frontend\controllers;
 
+use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Clock;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Logger;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaymentGatewayInterface;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaypalGateway;
@@ -20,13 +21,13 @@ function resolved(Application $app, bool $flag): void
     assertType(PaypalGateway::class, Yii::$app->get('payments'));
     assertType(PaypalGateway::class, $app->get('payments', false));
     assertType(Logger::class . '|' . PaypalGateway::class, $app->get($flag ? 'payments' : 'logger'));
+    assertType(Clock::class, $app->get('untyped'));
 }
 
 function skipped(Application $app, Module $module, string $id, bool $flag): void
 {
     assertType('object', $app->get($flag ? 'payments' : 'user'));
     assertType('object', $app->get('user'));
-    assertType('object', $app->get('untyped'));
     assertType('object', $app->get('removed'));
     assertType('object', $app->get('undefined'));
     assertType('object|null', $app->get('undefined', false));

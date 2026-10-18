@@ -467,6 +467,8 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Visitors\MethodReturnExpressionVisitor
 	-
 		class: MSpirkov\Yii2\PHPStan\Resolvers\ConfigValueTypeResolver
+		arguments:
+			parser: @defaultAnalysisParser
 	-
 		class: MSpirkov\Yii2\PHPStan\Resolvers\ExpressionValueResolver
 	-

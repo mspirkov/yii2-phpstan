@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace MSpirkov\Yii2\PHPStan\Resolvers;
 
 use Closure;
+use PhpParser\Node\Expr;
+use PhpParser\Node\FunctionLike;
+use PhpParser\NodeFinder;
+use PHPStan\Analyser\ScopeContext;
+use PHPStan\Analyser\ScopeFactory;
+use PHPStan\Parser\Parser;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
@@ -28,9 +34,21 @@ final class ConfigValueTypeResolver
 {
     private ReflectionProvider $reflectionProvider;
 
-    public function __construct(ReflectionProvider $reflectionProvider)
-    {
+    private ScopeFactory $scopeFactory;
+
+    private Parser $parser;
+
+    /** @var array<int, true> */
+    private array $inferringClosures = [];
+
+    public function __construct(
+        ReflectionProvider $reflectionProvider,
+        ScopeFactory $scopeFactory,
+        Parser $parser
+    ) {
         $this->reflectionProvider = $reflectionProvider;
+        $this->scopeFactory = $scopeFactory;
+        $this->parser = $parser;
     }
 
     public function resolveClassType(string $class): ?Type
@@ -45,7 +63,12 @@ final class ConfigValueTypeResolver
      */
     public function resolveClosureReturnType(Closure $closure): ?Type
     {
-        $returnType = (new ReflectionFunction($closure))->getReturnType();
+        $reflection = new ReflectionFunction($closure);
+        $returnType = $reflection->getReturnType();
+        if ($returnType === null) {
+            return $this->inferClosureReturnType($closure, $reflection);
+        }
+
         if (!$returnType instanceof ReflectionNamedType) {
             return null;
         }
@@ -66,12 +89,9 @@ final class ConfigValueTypeResolver
             return null;
         }
 
-        $type = ParametersAcceptorSelector::combineAcceptors(
+        return $this->filterObjectType(ParametersAcceptorSelector::combineAcceptors(
             $classReflection->getNativeMethod($method)->getVariants()
-        )->getReturnType();
-        $objectType = TypeCombinator::removeNull($type);
-
-        return $objectType->isObject()->yes() && $objectType->getObjectClassNames() !== [] ? $type : null;
+        )->getReturnType());
     }
 
     /**
@@ -100,6 +120,49 @@ final class ConfigValueTypeResolver
         }
 
         return is_bool($value) ? new BooleanType() : new MixedType();
+    }
+
+    /**
+     * @param Closure(mixed ...): mixed $closure
+     */
+    private function inferClosureReturnType(Closure $closure, ReflectionFunction $reflection): ?Type
+    {
+        $file = $reflection->getFileName();
+        $id = spl_object_id($closure);
+        if ($file === false || isset($this->inferringClosures[$id])) {
+            return null;
+        }
+
+        $nodes = array_values(array_filter(
+            (new NodeFinder())->findInstanceOf($this->parser->parseFile($file), Expr::class),
+            static fn(Expr $node): bool => $node instanceof FunctionLike
+                && $node->getStartLine() === $reflection->getStartLine()
+                && $node->getEndLine() === $reflection->getEndLine()
+        ));
+
+        if (count($nodes) !== 1) {
+            return null;
+        }
+
+        $this->inferringClosures[$id] = true;
+
+        try {
+            $scope = $this->scopeFactory->create(ScopeContext::create($file));
+            $type = ParametersAcceptorSelector::combineAcceptors(
+                $scope->getType($nodes[0])->getCallableParametersAcceptors($scope)
+            )->getReturnType();
+        } finally {
+            unset($this->inferringClosures[$id]);
+        }
+
+        return $this->filterObjectType($type);
+    }
+
+    private function filterObjectType(Type $type): ?Type
+    {
+        $objectType = TypeCombinator::removeNull($type);
+
+        return $objectType->isObject()->yes() && $objectType->getObjectClassNames() !== [] ? $type : null;
     }
 
     /**

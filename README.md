@@ -186,11 +186,11 @@ parameters:
 
 ## Type extensions
 
-The type extensions resolve types that Yii only knows at runtime. Except for the [`Yii::$app` type](#yiiapp-type), they read them from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its `paths`, config files and views included. The most specific path wins, and code in a path listed in several configs gets a type only when all of them define it, as the union of their types. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A path or config file that is missing, or a config file that doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
+The type extensions resolve types that Yii only knows at runtime. Except for the [`Yii::$app` type](#yiiapp-type), they read them from the configs in [`applicationConfigs`](#configuration). The config files are executed during analysis, so load what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) through `bootstrapFiles`.
 
 ### `Container::get()` return type
 
-Resolves a constant string ID through `container.definitions` and `container.singletons`: to the class its definition names, directly or in a `['class' => ...]` array, to the class of an object, to the declared return type of a factory, or through another ID or `Instance::of()` it points to. A named class isn't followed further to the implementation the container maps it to, and an ID that is a class keeps the class Yii declares for it, so code that asks for an interface keeps depending on the interface.
+Resolves a string ID to the class its definition in `container.definitions` or `container.singletons` names. An ID that is a class or an interface keeps that type, so code that asks for an interface keeps depending on it.
 
 ```php
 'container' => [
@@ -198,19 +198,19 @@ Resolves a constant string ID through `container.definitions` and `container.sin
         MailerInterface::class => SmtpMailer::class,
         'mailer' => MailerInterface::class,
         'mailer.smtp' => ['class' => SmtpMailer::class],
+        'clock' => static fn() => new SystemClock(),
     ],
 ],
 
+Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
 Yii::$container->get('mailer');               // MailerInterface instead of object
 Yii::$container->get('mailer.smtp');          // SmtpMailer instead of object
-Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
+Yii::$container->get('clock');                // SystemClock, inferred from the closure
 ```
 
 ### `Yii::$app` type
 
-Gives `Yii::$app` the type set in [`yiiAppTypes`](#configuration) for the code in the entry's `paths`. Paths match the way they do in `applicationConfigs`: the most specific one wins, and a path listed in several entries gets the union of their types. The type is a PHPDoc type of `yii\base\Application`, so it can name a custom application class or the identity class of the `user` component. An entry without `type` keeps the one Yii declares. `Yii::$app` stays nullable unless the entry sets `nullable: false`, and outside all the paths it keeps the declared type. A missing path, or a type that isn't a `yii\base\Application`, stops the analysis.
-
-As with `Yii::$app->params`, PHPStan 2.3 narrows `Yii::$app` (`instanceof`, `=== null`, ...) from the type Yii declares rather than the resolved one. In `common`, `Yii::$app instanceof yii\web\Application` gives `yii\web\Application<yii\web\IdentityInterface>`, not `yii\web\Application<common\models\User>`.
+Gives `Yii::$app` the type set in [`yiiAppTypes`](#configuration), e.g. a custom application class or the identity class of the `user` component.
 
 With the yii2-app-advanced setup from [Configuration](#configuration):
 
@@ -229,7 +229,7 @@ Yii::$app;                 // yii\console\Application|yii\web\Application|null, 
 
 ### `Yii::$app` components
 
-Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` from `components`, the same way: to the class the component names, or through the container definitions when it names an ID. A component defined in any config is known everywhere: outside the paths of its configs it resolves to the union of its types across them.
+Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` to the class set in `components`.
 
 ```php
 'components' => [
@@ -244,9 +244,7 @@ Yii::$app->get('payments'); // StripeGateway instead of object
 
 ### `Yii::$app->params`
 
-Resolves to an array shape with the keys of `params` and their values generalized to types, since the values usually differ between environments.
-
-PHPStan 2.3 seems to have a bug here: `isset()` and `??` directly on `Yii::$app->params[...]` narrow the declared `array` type of the property instead of the resolved shape, so the result is `mixed`. Reading the params into a variable first keeps the shape.
+Resolves to an array shape of `params`, with the values generalized to types.
 
 ```php
 'params' => [

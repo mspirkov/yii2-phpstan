@@ -27,6 +27,7 @@ function components(Application $app): void
     assertType(Clock::class, $app->clock);
     assertType(ClockFactory::class, $app->clockFactory);
     assertType(Clock::class, $app->factoryClock);
+    assertType(Clock::class, $app->untyped);
     assertType(Clock::class, $app->frontendOnly);
 }
 
@@ -40,7 +41,6 @@ function params(Application $app): void
 function skipped(Application $app, Module $module, string $name): void
 {
     assertType(User::class . '<' . IdentityInterface::class . '>', $app->user);
-    assertType('object', $app->untyped);
     assertType('object', $app->invalid);
     assertType('*ERROR*', $module->payments);
     assertType('mixed', $app->$name);
