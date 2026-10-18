@@ -247,9 +247,10 @@ Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` to the class set
     'payments' => ['class' => StripeGateway::class],
 ],
 
-Yii::$app->mailer;          // SymfonyMailer instead of MailerInterface
-Yii::$app->payments;        // StripeGateway instead of an undefined property
-Yii::$app->get('payments'); // StripeGateway instead of object
+Yii::$app->mailer;                 // SymfonyMailer instead of MailerInterface
+Yii::$app->payments;               // StripeGateway instead of an undefined property
+Yii::$app->get('payments');        // StripeGateway instead of object
+Yii::$app->get('payments', false); // StripeGateway|null instead of object|null
 ```
 
 ### `Yii::$app->params`
