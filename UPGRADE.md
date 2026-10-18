@@ -53,4 +53,4 @@ Every change in steps 3 and 4 is the same rename, so replacing `mspirkovYii2Rule
 
 ### New: type extensions
 
-The package now resolves types that Yii only knows at runtime from your application configs: `Yii::$container->get()` through the container definitions, `Yii::$app` components and `Yii::$app->get()` through the components, and the keys and value types of `Yii::$app->params`. It's opt-in through the new `mspirkovYii2.applicationConfigs` parameter. Without it, types stay as they were. See [Type extensions](README.md#type-extensions) in the README for the setup.
+The package now resolves types that Yii only knows at runtime from your application configs: `Yii::$container->get()` through the container definitions, `Yii::$app` components and `Yii::$app->get()` through the components, and the keys and value types of `Yii::$app->params`. It's opt-in through the new `mspirkovYii2.applicationConfigs` parameter. Without it, types stay as they were. The type of `Yii::$app` itself, with or without `null`, can be set per path through the new `mspirkovYii2.yiiAppTypes` parameter. See [Type extensions](README.md#type-extensions) in the README for the setup.

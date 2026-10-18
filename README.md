@@ -85,6 +85,27 @@ parameters:
                     - %currentWorkingDirectory%/frontend/config/main.php
                     - %currentWorkingDirectory%/frontend/config/main-local.php
 
+        # Type of Yii::$app for the code in the paths, matched as in applicationConfigs. `type` is a PHPDoc
+        # type, the one Yii declares when omitted, and `nullable: false` removes null from it. Outside the
+        # paths, Yii::$app keeps the declared type. Here for yii2-app-advanced:
+        yiiAppTypes:
+            -
+                paths:
+                    - %currentWorkingDirectory%/backend
+                    - %currentWorkingDirectory%/frontend
+                type: yii\web\Application<common\models\User>
+                nullable: false
+            -
+                paths:
+                    - %currentWorkingDirectory%/common
+                type: yii\console\Application|yii\web\Application<common\models\User>
+                nullable: false
+            -
+                paths:
+                    - %currentWorkingDirectory%/console
+                type: yii\console\Application
+                nullable: false
+
         # Master switch — false disables every rule below
         enableAllRules: false
 
@@ -165,7 +186,7 @@ parameters:
 
 ## Type extensions
 
-The type extensions resolve types that Yii only knows at runtime from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its `paths`, config files and views included. The most specific path wins, and code in a path listed in several configs gets a type only when all of them define it, as the union of their types. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A path or config file that is missing, or a config file that doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
+The type extensions resolve types that Yii only knows at runtime. Except for the [`Yii::$app` type](#yiiapp-type), they read them from the configs set in [`applicationConfigs`](#configuration), each config applying to the code in its `paths`, config files and views included. The most specific path wins, and code in a path listed in several configs gets a type only when all of them define it, as the union of their types. The config files are executed during analysis, so what they rely on (`Yii.php`, aliases, `YII_ENV`, ...) has to be loaded, e.g. through `bootstrapFiles`, which are always loaded before the first config file. A path or config file that is missing, or a config file that doesn't return an array, stops the analysis, and a change to the config files or the files they include invalidates the result cache.
 
 ### `Container::get()` return type
 
@@ -183,6 +204,27 @@ Resolves a constant string ID through `container.definitions` and `container.sin
 Yii::$container->get('mailer');               // MailerInterface instead of object
 Yii::$container->get('mailer.smtp');          // SmtpMailer instead of object
 Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
+```
+
+### `Yii::$app` type
+
+Gives `Yii::$app` the type set in [`yiiAppTypes`](#configuration) for the code in the entry's `paths`. Paths match the way they do in `applicationConfigs`: the most specific one wins, and a path listed in several entries gets the union of their types. The type is a PHPDoc type of `yii\base\Application`, so it can name a custom application class or the identity class of the `user` component. An entry without `type` keeps the one Yii declares. `Yii::$app` stays nullable unless the entry sets `nullable: false`, and outside all the paths it keeps the declared type. A missing path, or a type that isn't a `yii\base\Application`, stops the analysis.
+
+As with `Yii::$app->params`, PHPStan 2.3 narrows `Yii::$app` (`instanceof`, `=== null`, ...) from the type Yii declares rather than the resolved one. In `common`, `Yii::$app instanceof yii\web\Application` gives `yii\web\Application<yii\web\IdentityInterface>`, not `yii\web\Application<common\models\User>`.
+
+With the yii2-app-advanced setup from [Configuration](#configuration):
+
+```php
+// backend, frontend
+Yii::$app;                 // yii\web\Application<common\models\User> instead of yii\console\Application|yii\web\Application|null
+Yii::$app->user->identity; // common\models\User|null instead of yii\web\IdentityInterface|null
+Yii::$app?->id;            // ✗ Using nullsafe property access on non-nullable type
+
+// console
+Yii::$app;                 // yii\console\Application
+
+// outside yiiAppTypes
+Yii::$app;                 // yii\console\Application|yii\web\Application|null, as Yii declares it
 ```
 
 ### `Yii::$app` components

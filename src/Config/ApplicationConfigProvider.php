@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSpirkov\Yii2\PHPStan\Config;
 
+use MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer;
 use PHPStan\Analyser\ResultCache\ResultCacheMetaExtension;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
@@ -15,6 +16,8 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
 
     /** @var list<string> */
     private array $bootstrapFiles;
+
+    private PathAnalyzer $pathAnalyzer;
 
     /** @var array<int, array<mixed>> */
     private array $mergedConfigs = [];
@@ -32,26 +35,17 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
      * @param list<array{paths: list<string>, files: list<string>}> $applicationConfigs
      * @param list<string> $bootstrapFiles
      */
-    public function __construct(array $applicationConfigs, array $bootstrapFiles)
+    public function __construct(array $applicationConfigs, array $bootstrapFiles, PathAnalyzer $pathAnalyzer)
     {
         foreach ($applicationConfigs as $applicationConfig) {
-            $paths = [];
-            foreach ($applicationConfig['paths'] as $path) {
-                $realPath = realpath($path);
-                if ($realPath === false) {
-                    throw new InvalidConfigException(sprintf(
-                        'Path "%s" of the "mspirkovYii2.applicationConfigs" parameter does not exist.',
-                        $path
-                    ));
-                }
-
-                $paths[] = $realPath;
-            }
-
-            $this->applicationConfigs[] = ['paths' => $paths, 'files' => $applicationConfig['files']];
+            $this->applicationConfigs[] = [
+                'paths' => $pathAnalyzer->resolveRealPaths($applicationConfig['paths'], 'mspirkovYii2.applicationConfigs'),
+                'files' => $applicationConfig['files'],
+            ];
         }
 
         $this->bootstrapFiles = $bootstrapFiles;
+        $this->pathAnalyzer = $pathAnalyzer;
     }
 
     /**
@@ -60,7 +54,10 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
     public function findConfigs(string $file): array
     {
         if (!isset($this->fileConfigIndexes[$file])) {
-            $this->fileConfigIndexes[$file] = $this->findConfigIndexes($file);
+            $this->fileConfigIndexes[$file] = $this->pathAnalyzer->findClosestPathIndexes(
+                $file,
+                array_column($this->applicationConfigs, 'paths')
+            );
         }
 
         return array_map(fn(int $index): array => $this->getConfig($index), $this->fileConfigIndexes[$file]);
@@ -90,38 +87,6 @@ final class ApplicationConfigProvider implements ResultCacheMetaExtension
             static fn(string $file): string => $file . ':' . sha1_file($file),
             $files
         )));
-    }
-
-    /**
-     * @return list<int>
-     */
-    private function findConfigIndexes(string $file): array
-    {
-        $realPath = realpath($file);
-        $file = $realPath === false ? $file : $realPath;
-
-        $indexes = [];
-        $longestLength = 0;
-        foreach ($this->applicationConfigs as $index => $applicationConfig) {
-            foreach ($applicationConfig['paths'] as $path) {
-                $length = strlen($path);
-                if (
-                    $length < $longestLength
-                    || ($file !== $path && strncmp($file, $path . DIRECTORY_SEPARATOR, $length + 1) !== 0)
-                ) {
-                    continue;
-                }
-
-                if ($length > $longestLength) {
-                    $indexes = [];
-                    $longestLength = $length;
-                }
-
-                $indexes[$index] = $index;
-            }
-        }
-
-        return array_values($indexes);
     }
 
     /**
