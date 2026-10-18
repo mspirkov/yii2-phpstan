@@ -202,9 +202,9 @@ Resolves a constant string ID through `container.definitions` and `container.sin
     ],
 ],
 
+Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
 Yii::$container->get('mailer');               // MailerInterface instead of object
 Yii::$container->get('mailer.smtp');          // SmtpMailer instead of object
-Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
 Yii::$container->get('clock');                // SystemClock, inferred from the closure
 ```
 
