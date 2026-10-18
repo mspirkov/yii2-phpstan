@@ -11,6 +11,7 @@ parameters:
 			- php
 		viewPaths: []
 		applicationConfigs: []
+		yiiAppTypes: []
 		actionComplexity:
 			ifCount: 3
 			foreachCount: 0
@@ -114,6 +115,11 @@ parametersSchema:
 		applicationConfigs: listOf(structure([
 			paths: listOf(string())
 			files: listOf(string())
+		]))
+		yiiAppTypes: listOf(structure([
+			paths: listOf(string())
+			?type: string()
+			?nullable: bool()
 		]))
 		actionComplexity: structure([
 			ifCount: int()
@@ -392,6 +398,12 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Extensions\ContainerGetDynamicReturnTypeExtension
 		tags:
 			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\YiiAppExpressionTypeResolverExtension
+		arguments:
+			yiiAppTypes: %mspirkovYii2.yiiAppTypes%
+		tags:
+			- phpstan.broker.expressionTypeResolverExtension
 
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ActionComplexityAnalyzer
@@ -439,6 +451,8 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ModelAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\NamespaceAnalyzer
+	-
+		class: MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\QueryAnalyzer
 	-

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Config;
 
+use MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer;
 use MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider;
 use PHPUnit\Framework\TestCase;
 use yii\base\InvalidConfigException;
@@ -127,6 +128,6 @@ final class ApplicationConfigProviderTest extends TestCase
      */
     private function createProvider(array $applicationConfigs, array $bootstrapFiles = []): ApplicationConfigProvider
     {
-        return new ApplicationConfigProvider($applicationConfigs, $bootstrapFiles);
+        return new ApplicationConfigProvider($applicationConfigs, $bootstrapFiles, new PathAnalyzer());
     }
 }

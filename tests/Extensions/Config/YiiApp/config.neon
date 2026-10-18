@@ -1,0 +1,28 @@
+parameters:
+	mspirkovYii2:
+		yiiAppTypes:
+			-
+				paths:
+					- tests/Extensions/Data/YiiApp/web
+					- tests/Extensions/Data/YiiApp/shared
+				type: yii\web\Application<MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\YiiApp\User>
+				nullable: false
+			-
+				paths:
+					- tests/Extensions/Data/YiiApp/web/api
+				type: MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\YiiApp\ApiApplication
+				nullable: false
+			-
+				paths:
+					- tests/Extensions/Data/YiiApp/web/legacy
+				type: yii\web\Application
+			-
+				paths:
+					- tests/Extensions/Data/YiiApp/untyped
+				nullable: false
+			-
+				paths:
+					- tests/Extensions/Data/YiiApp/console
+					- tests/Extensions/Data/YiiApp/shared
+				type: yii\console\Application
+				nullable: false
