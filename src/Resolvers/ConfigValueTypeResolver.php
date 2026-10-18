@@ -41,8 +41,11 @@ final class ConfigValueTypeResolver
     /** @var array<int, true> */
     private array $inferringClosures = [];
 
-    public function __construct(ReflectionProvider $reflectionProvider, ScopeFactory $scopeFactory, Parser $parser)
-    {
+    public function __construct(
+        ReflectionProvider $reflectionProvider,
+        ScopeFactory $scopeFactory,
+        Parser $parser
+    ) {
         $this->reflectionProvider = $reflectionProvider;
         $this->scopeFactory = $scopeFactory;
         $this->parser = $parser;
