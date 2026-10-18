@@ -63,6 +63,15 @@ final class ApplicationGetDynamicReturnTypeExtension implements DynamicMethodRet
             $types[] = $type;
         }
 
-        return TypeCombinator::union(...$types);
+        $type = TypeCombinator::union(...$types);
+
+        return $this->canReturnNull($methodCall, $scope) ? TypeCombinator::addNull($type) : $type;
+    }
+
+    private function canReturnNull(MethodCall $methodCall, Scope $scope): bool
+    {
+        $throwExceptionArg = $methodCall->getArgs()[1] ?? null;
+
+        return $throwExceptionArg !== null && !$scope->getType($throwExceptionArg->value)->isTrue()->yes();
     }
 }

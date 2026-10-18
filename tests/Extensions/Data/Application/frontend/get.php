@@ -19,7 +19,9 @@ function resolved(Application $app, bool $flag): void
     assertType(PaypalGateway::class, $app->get('payments'));
     assertType(PaymentGatewayInterface::class, $app->get('gateway'));
     assertType(PaypalGateway::class, Yii::$app->get('payments'));
-    assertType(PaypalGateway::class, $app->get('payments', false));
+    assertType(PaypalGateway::class, $app->get('payments', true));
+    assertType(PaypalGateway::class . '|null', $app->get('payments', false));
+    assertType(PaypalGateway::class . '|null', $app->get('payments', $flag));
     assertType(Logger::class . '|' . PaypalGateway::class, $app->get($flag ? 'payments' : 'logger'));
     assertType(Clock::class, $app->get('untyped'));
 }
