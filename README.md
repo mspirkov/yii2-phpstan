@@ -190,7 +190,7 @@ The type extensions resolve types that Yii only knows at runtime. Except for the
 
 ### `Container::get()` return type
 
-Resolves a constant string ID through `container.definitions` and `container.singletons`: to the class its definition names, directly or in a `['class' => ...]` array, to the class of an object, to the declared return type of a factory, or through another ID or `Instance::of()` it points to. A named class isn't followed further to the implementation the container maps it to, and an ID that is a class keeps the class Yii declares for it, so code that asks for an interface keeps depending on the interface.
+Resolves a constant string ID through `container.definitions` and `container.singletons`: to the class its definition names, directly or in a `['class' => ...]` array, to the class of an object, to the declared return type of a factory or, for a closure that declares none, to the one inferred from its body, or through another ID or `Instance::of()` it points to. A named class isn't followed further to the implementation the container maps it to, and an ID that is a class keeps the class Yii declares for it, so code that asks for an interface keeps depending on the interface.
 
 ```php
 'container' => [
@@ -198,12 +198,14 @@ Resolves a constant string ID through `container.definitions` and `container.sin
         MailerInterface::class => SmtpMailer::class,
         'mailer' => MailerInterface::class,
         'mailer.smtp' => ['class' => SmtpMailer::class],
+        'clock' => static fn() => new SystemClock(),
     ],
 ],
 
 Yii::$container->get('mailer');               // MailerInterface instead of object
 Yii::$container->get('mailer.smtp');          // SmtpMailer instead of object
 Yii::$container->get(MailerInterface::class); // MailerInterface, as Yii declares it
+Yii::$container->get('clock');                // SystemClock, inferred from the closure
 ```
 
 ### `Yii::$app` type

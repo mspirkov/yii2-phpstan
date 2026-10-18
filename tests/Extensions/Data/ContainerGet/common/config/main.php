@@ -8,6 +8,7 @@ use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\FileLogger;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Logger;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\Mailer;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\ContainerGet\MailerInterface;
+use yii\di\Container;
 use yii\di\Instance;
 
 return [
@@ -32,7 +33,14 @@ return [
             'clock.invokable' => new ClockFactory(),
             'clock.instance' => new Clock(),
             'clock.overridden' => Logger::class,
-            'untyped' => static fn() => new Clock(),
+            'clock.untyped' => static fn() => new Clock(),
+            'clock.untypedNullable' => static function (Container $container, array $params) {
+                return $params === [] ? null : new Clock();
+            },
+            'untyped' => static fn() => 42,
+            'untyped.self' => static fn(Container $container) => $container->get('untyped.self'),
+            'untyped.sameLine' => static fn() => static fn() => new Clock(),
+            'untyped.internal' => Closure::fromCallable('tmpfile'),
             'builtin' => static fn(): object => new Clock(),
             'missingReturnClass' => static fn(): \app\MissingClass => new Clock(),
             'anonymous' => new class {},

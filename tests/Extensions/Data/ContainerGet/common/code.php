@@ -27,6 +27,8 @@ function resolved(Container $container): void
     assertType(FileLogger::class, $container->get('logger.shared'));
     assertType(Clock::class, $container->get('clock'));
     assertType(Clock::class . '|null', $container->get('clock.nullable'));
+    assertType(Clock::class, $container->get('clock.untyped'));
+    assertType(Clock::class . '|null', $container->get('clock.untypedNullable'));
     assertType(Clock::class, $container->get('clock.factory'));
     assertType(Clock::class, $container->get('clock.factoryInstance'));
     assertType(Clock::class . '|null', $container->get('clock.nullableFactory'));
@@ -44,6 +46,9 @@ function unions(Container $container, bool $flag): void
 function skipped(Container $container, string $id): void
 {
     assertType('object', $container->get('untyped'));
+    assertType('object', $container->get('untyped.self'));
+    assertType('object', $container->get('untyped.sameLine'));
+    assertType('object', $container->get('untyped.internal'));
     assertType('object', $container->get('builtin'));
     assertType('object', $container->get('missingReturnClass'));
     assertType('object', $container->get('anonymous'));
