@@ -280,6 +280,16 @@ $post->detachBehavior('timestamp');
 $post->touch('updated_at'); // ✗ Call to an undefined method
 ```
 
+### Environment constants
+
+Types `YII_DEBUG`, `YII_ENV_DEV`, `YII_ENV_PROD` and `YII_ENV_TEST` as `bool` and `YII_ENV` as `string` instead of the values defined in `bootstrapFiles`, so code for other environments isn't reported as always true or false.
+
+```php
+// bootstrapFiles: define('YII_ENV', 'prod');
+YII_ENV;     // string instead of 'prod'
+YII_ENV_DEV; // bool instead of false, so `if (YII_ENV_DEV)` isn't always false
+```
+
 ## Rules at a glance
 
 ### Validation rules
