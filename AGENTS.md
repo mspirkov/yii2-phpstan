@@ -12,6 +12,8 @@ src/
   Visitors/    PhpParser NodeVisitor implementations used by Finders
   Resolvers/   Small "what does this expression statically resolve to" helpers
   Extensions/  PHPStan type extensions (e.g. `ContainerGetDynamicReturnTypeExtension`), wired in extension.neon
+  Reflection/  PHPStan reflection implementations the extensions return (e.g. `ApplicationComponentPropertyReflection`)
+  Type/        PHPStan type implementations the extensions narrow to (e.g. `ComponentWithBehaviorsType`)
   Config/      Loading of the user's Yii application configs (`ApplicationConfigProvider`)
 tests/
   Rules/*Test.php        one test class per rule, extends AbstractTestCase

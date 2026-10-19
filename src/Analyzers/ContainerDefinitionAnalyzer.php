@@ -49,7 +49,7 @@ final class ContainerDefinitionAnalyzer
      * @param mixed $type
      * @param array<mixed> $config
      */
-    public function resolveCreateObjectType($type, array $config): ?Type
+    public function resolveYiiCreateObjectType($type, array $config): ?Type
     {
         if (is_string($type)) {
             return $this->resolveNamedType($type, $this->getDefinitions($config), []);

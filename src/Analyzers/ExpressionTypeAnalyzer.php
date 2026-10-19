@@ -9,6 +9,8 @@ use PhpParser\Node\Expr\Array_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 
@@ -124,6 +126,18 @@ final class ExpressionTypeAnalyzer
     }
 
     /**
+     * @param class-string $parentClass
+     */
+    public function resolveYiiCreateObjectType(Type $definitionType, string $parentClass): ?Type
+    {
+        $objectType = $definitionType->isArray()->yes()
+            ? $this->getConfigClassType($definitionType)->getClassStringObjectType()
+            : $definitionType->getObjectTypeOrClassStringObjectType();
+
+        return (new ObjectType($parentClass))->isSuperTypeOf($objectType)->yes() ? $objectType : null;
+    }
+
+    /**
      * @param list<class-string> $classNames
      */
     public function isTypeAnyOf(Type $type, array $classNames): bool
@@ -137,5 +151,18 @@ final class ExpressionTypeAnalyzer
         }
 
         return false;
+    }
+
+    private function getConfigClassType(Type $configType): Type
+    {
+        foreach (['__class', 'class'] as $key) {
+            $keyType = new ConstantStringType($key);
+            $hasKey = $configType->hasOffsetValueType($keyType);
+            if (!$hasKey->no()) {
+                return $hasKey->yes() ? $configType->getOffsetValueType($keyType) : new MixedType();
+            }
+        }
+
+        return new MixedType();
     }
 }

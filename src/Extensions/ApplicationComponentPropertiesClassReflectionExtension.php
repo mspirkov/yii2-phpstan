@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSpirkov\Yii2\PHPStan\Extensions;
 
 use MSpirkov\Yii2\PHPStan\Analyzers\ApplicationConfigAnalyzer;
+use MSpirkov\Yii2\PHPStan\Reflection\ApplicationComponentPropertyReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\PropertiesClassReflectionExtension;
 use PHPStan\Reflection\PropertyReflection;
