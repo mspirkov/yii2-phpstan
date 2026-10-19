@@ -89,7 +89,7 @@ final class ApplicationConfigAnalyzer
 
         return $definition === null
             ? null
-            : $this->containerDefinitionAnalyzer->resolveCreateObjectType($definition, $config);
+            : $this->containerDefinitionAnalyzer->resolveYiiCreateObjectType($definition, $config);
     }
 
     /**

@@ -8,7 +8,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/mspirkov/yii2-phpstan.svg?branch=main&style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/mspirkov/yii2-phpstan)
 [![PHPStan Level Max](https://img.shields.io/badge/Max-7A86B8.svg?style=for-the-badge&label=PHPStan%20Level)](https://github.com/mspirkov/yii2-phpstan/blob/main/phpstan.dist.neon)
 
-[PHPStan](https://phpstan.org) rules and type extensions for [Yii2](https://github.com/yiisoft/yii2). The rules check the config arrays and names that Yii2 only resolves at runtime, and keep business logic and database access out of controllers and views. The type extensions resolve types from the application config, such as the class behind a DI container ID. The rules are my own conventions, not a standard: use what's useful and disable the rest.
+[PHPStan](https://phpstan.org) rules and type extensions for [Yii2](https://github.com/yiisoft/yii2). The rules check the config arrays and names that Yii2 only resolves at runtime, and keep business logic and database access out of controllers and views. The type extensions resolve types that Yii only knows at runtime, such as the class behind a DI container ID or the methods of an attached behavior. The rules are my own conventions, not a standard: use what's useful and disable the rest.
 
 ## Support
 
@@ -198,7 +198,7 @@ parameters:
 
 ## Type extensions
 
-The type extensions resolve types that Yii only knows at runtime. Set them up in [Application configs](#application-configs) and [`Yii::$app` types](#yiiapp-types).
+The type extensions resolve types that Yii only knows at runtime. Those that read the application config are set up in [Application configs](#application-configs) and [`Yii::$app` types](#yiiapp-types).
 
 ### `Container::get()` return type
 
@@ -265,6 +265,19 @@ Resolves to an array shape of `params`, with the values generalized to types.
 
 Yii::$app->params;             // array{adminEmail: string, pageSize: int}
 Yii::$app->params['pageSzie']; // ✗ Offset 'pageSzie' does not exist
+```
+
+### Attached behaviors
+
+Makes the methods and properties of the behaviors attached by `attachBehavior()` / `attachBehaviors()` available on the component until `detachBehavior()` / `detachBehaviors()`.
+
+```php
+$post->attachBehavior('timestamp', TimestampBehavior::class);
+$post->touch('updated_at'); // TimestampBehavior::touch() instead of an undefined method
+$post->createdAtAttribute;  // string instead of an undefined property
+
+$post->detachBehavior('timestamp');
+$post->touch('updated_at'); // ✗ Call to an undefined method
 ```
 
 ## Rules at a glance

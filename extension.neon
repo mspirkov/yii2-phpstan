@@ -395,6 +395,10 @@ services:
 		tags:
 			- phpstan.broker.expressionTypeResolverExtension
 	-
+		class: MSpirkov\Yii2\PHPStan\Extensions\ComponentBehaviorTypeSpecifyingExtension
+		tags:
+			- phpstan.typeSpecifier.methodTypeSpecifyingExtension
+	-
 		class: MSpirkov\Yii2\PHPStan\Extensions\ContainerGetDynamicReturnTypeExtension
 		tags:
 			- phpstan.broker.dynamicMethodReturnTypeExtension
