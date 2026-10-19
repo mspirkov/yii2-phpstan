@@ -150,10 +150,6 @@ final class ComponentWithBehaviorsType extends ObjectType
         return null;
     }
 
-    /**
-     * Whether each behavior of this type is attached to the given one under the same name, as the same or a narrower
-     * type.
-     */
     private function hasBehaviorsAttachedTo(self $type): bool
     {
         foreach ($this->behaviors as $name => $behavior) {
