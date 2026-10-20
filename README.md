@@ -42,7 +42,7 @@ The classes of [yiisoft/yii2-mongodb](https://github.com/yiisoft/yii2-mongodb) a
 
 ## Configuration
 
-All parameters go under `parameters.mspirkovYii2`.
+All parameters go under `parameters.mspirkovYii2`. Relative paths are resolved from the directory PHPStan runs in.
 
 ### Enabling rules
 
@@ -70,34 +70,34 @@ parameters:
         applicationConfigs:
             -
                 paths:
-                    - %currentWorkingDirectory%/backend
+                    - backend
                 files:
-                    - %currentWorkingDirectory%/common/config/main.php
-                    - %currentWorkingDirectory%/common/config/main-local.php
-                    - %currentWorkingDirectory%/backend/config/main.php
-                    - %currentWorkingDirectory%/backend/config/main-local.php
+                    - common/config/main.php
+                    - common/config/main-local.php
+                    - backend/config/main.php
+                    - backend/config/main-local.php
             -
                 paths:
-                    - %currentWorkingDirectory%/common
+                    - common
                 files:
-                    - %currentWorkingDirectory%/common/config/main.php
-                    - %currentWorkingDirectory%/common/config/main-local.php
+                    - common/config/main.php
+                    - common/config/main-local.php
             -
                 paths:
-                    - %currentWorkingDirectory%/console
+                    - console
                 files:
-                    - %currentWorkingDirectory%/common/config/main.php
-                    - %currentWorkingDirectory%/common/config/main-local.php
-                    - %currentWorkingDirectory%/console/config/main.php
-                    - %currentWorkingDirectory%/console/config/main-local.php
+                    - common/config/main.php
+                    - common/config/main-local.php
+                    - console/config/main.php
+                    - console/config/main-local.php
             -
                 paths:
-                    - %currentWorkingDirectory%/frontend
+                    - frontend
                 files:
-                    - %currentWorkingDirectory%/common/config/main.php
-                    - %currentWorkingDirectory%/common/config/main-local.php
-                    - %currentWorkingDirectory%/frontend/config/main.php
-                    - %currentWorkingDirectory%/frontend/config/main-local.php
+                    - common/config/main.php
+                    - common/config/main-local.php
+                    - frontend/config/main.php
+                    - frontend/config/main-local.php
 ```
 
 ### `Yii::$app` types
@@ -110,18 +110,18 @@ parameters:
         yiiAppTypes:
             -
                 paths:
-                    - %currentWorkingDirectory%/backend
-                    - %currentWorkingDirectory%/frontend
+                    - backend
+                    - frontend
                 type: yii\web\Application<common\models\User>
                 nullable: false
             -
                 paths:
-                    - %currentWorkingDirectory%/common
+                    - common
                 type: yii\console\Application|yii\web\Application<common\models\User>
                 nullable: false
             -
                 paths:
-                    - %currentWorkingDirectory%/console
+                    - console
                 type: yii\console\Application
                 nullable: false
 ```
@@ -135,8 +135,8 @@ parameters:
     mspirkovYii2:
         # Root aliases (`@app`, not `@app/modules`) for `@alias/...` names. `//...` names go through `@app/views`
         aliases:
-            '@app': %currentWorkingDirectory%
-            '@shared': %currentWorkingDirectory%/modules/shared
+            '@app': .
+            '@shared': modules/shared
 
         # Tried in order for names without an extension, `php` by default
         viewExtensions:
@@ -146,7 +146,7 @@ parameters:
         # Views directory for the controllers in a namespace, the most specific one wins.
         # `SiteController` reads `resources/frontend/views/site/*`
         viewPaths:
-            'App\Frontend\Controllers': %currentWorkingDirectory%/resources/frontend/views
+            'App\Frontend\Controllers': resources/frontend/views
 ```
 
 ### Rule options
