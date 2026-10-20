@@ -8,24 +8,10 @@ use MSpirkov\Yii2\PHPStan\Analyzers\ExpressionTypeAnalyzer;
 use MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer;
 use MSpirkov\Yii2\PHPStan\Extensions\YiiAppExpressionTypeResolverExtension;
 use PHPStan\PhpDoc\TypeStringResolver;
-use PHPStan\Testing\TypeInferenceTestCase;
 use yii\base\InvalidConfigException;
 
-final class YiiAppExpressionTypeResolverExtensionTest extends TypeInferenceTestCase
+final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
 {
-    /**
-     * @dataProvider dataFiles
-     */
-    public function testFileAsserts(string $file): void
-    {
-        foreach (self::gatherAssertTypes($file) as $assert) {
-            $this->assertFileAsserts(...$assert);
-        }
-    }
-
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function dataFiles(): iterable
     {
         yield 'web' => [__DIR__ . '/Data/YiiApp/web/code.php'];
@@ -67,11 +53,8 @@ final class YiiAppExpressionTypeResolverExtensionTest extends TypeInferenceTestC
         yield 'nullable' => ['yii\web\Application|null'];
     }
 
-    public static function getAdditionalConfigFiles(): array
+    protected static function getAdditionalConfigFile(): string
     {
-        return array_merge(parent::getAdditionalConfigFiles(), [
-            __DIR__ . '/../../extension.neon',
-            __DIR__ . '/Config/YiiApp/config.neon',
-        ]);
+        return __DIR__ . '/Config/YiiApp/config.neon';
     }
 }

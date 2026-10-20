@@ -8,26 +8,12 @@ use MSpirkov\Yii2\PHPStan\Extensions\ApplicationComponentPropertiesClassReflecti
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaypalGateway;
 use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\StripeGateway;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Testing\TypeInferenceTestCase;
 use PHPStan\Type\VerbosityLevel;
 use yii\base\Module;
 use yii\web\Application;
 
-final class ApplicationComponentPropertiesClassReflectionExtensionTest extends TypeInferenceTestCase
+final class ApplicationComponentPropertiesClassReflectionExtensionTest extends AbstractTestCase
 {
-    /**
-     * @dataProvider dataFiles
-     */
-    public function testFileAsserts(string $file): void
-    {
-        foreach (self::gatherAssertTypes($file) as $assert) {
-            $this->assertFileAsserts(...$assert);
-        }
-    }
-
-    /**
-     * @return iterable<string, array{string}>
-     */
     public static function dataFiles(): iterable
     {
         yield 'console' => [__DIR__ . '/Data/Application/console/properties.php'];
@@ -66,12 +52,9 @@ final class ApplicationComponentPropertiesClassReflectionExtensionTest extends T
         self::assertTrue($property->isInternal()->no());
     }
 
-    public static function getAdditionalConfigFiles(): array
+    protected static function getAdditionalConfigFile(): string
     {
-        return array_merge(parent::getAdditionalConfigFiles(), [
-            __DIR__ . '/../../extension.neon',
-            __DIR__ . '/Config/Application/config.neon',
-        ]);
+        return __DIR__ . '/Config/Application/config.neon';
     }
 
     private function getExtension(): ApplicationComponentPropertiesClassReflectionExtension
