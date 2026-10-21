@@ -6,6 +6,7 @@ use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\C
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\NoConfigObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\NoParamsObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\PositionalObject;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\SetterObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\SimpleObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\ThirdPartyObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\VariadicObject;
@@ -26,6 +27,9 @@ final class ValidObjectUsage
         // (no real property or setter backs it) and "unknownOption" isn't a property at all —
         // both would normally be flagged as unknown options.
         new ThirdPartyObject(['apiKey' => 'secret', 'unknownOption' => 'x']);
+
+        // A non-public property is assigned through its setter, so the setter's parameter type applies.
+        new SetterObject(['transport' => ['dsn' => 'smtp://localhost']]);
     }
 }
 
@@ -41,6 +45,10 @@ final class InvalidObjectUsage
 
         // Skipping "extraOption" doesn't exempt the class's other, real options.
         new ConfigProcessingObject(['namee' => 'x', 'extraOption' => 'y']);
+
+        // A non-public property is only settable from config through a setter.
+        new SetterObject(['transport' => 5]);
+        new SetterObject(['secret' => 'x']);
     }
 }
 
@@ -72,5 +80,8 @@ final class SkippedObjectUsage
 
         // Config built dynamically — not an array literal.
         new SimpleObject($dynamicConfig);
+
+        // Setter takes no parameters — there's no type to check the value against.
+        new SetterObject(['defaults' => 'x']);
     }
 }

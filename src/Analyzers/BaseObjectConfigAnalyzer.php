@@ -179,17 +179,16 @@ final class BaseObjectConfigAnalyzer
                 continue;
             }
 
-            $instanceProperty = $this->baseObjectPropertyAnalyzer->findInstanceProperty(
+            $expectedType = $this->baseObjectPropertyAnalyzer->findWritableType(
                 $classReflection,
                 $optionName,
                 $scope
             );
 
-            if ($instanceProperty === null || !$instanceProperty->isWritable()) {
+            if ($expectedType === null) {
                 continue;
             }
 
-            $expectedType = $instanceProperty->getWritableType();
             $actualType = $scope->getType($item->value);
             if ($expectedType instanceof MixedType || $actualType instanceof MixedType) {
                 continue;

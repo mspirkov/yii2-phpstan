@@ -7,6 +7,8 @@ namespace MSpirkov\Yii2\PHPStan\Analyzers;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedPropertyReflection;
+use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Type\Type;
 
 final class BaseObjectPropertyAnalyzer
 {
@@ -27,12 +29,32 @@ final class BaseObjectPropertyAnalyzer
         string $propertyName,
         Scope $scope
     ): bool {
-        $instanceProperty = $this->findInstanceProperty($classReflection, $propertyName, $scope);
-        if ($instanceProperty !== null && $instanceProperty->isWritable()) {
+        if ($this->findPublicWritableProperty($classReflection, $propertyName, $scope) !== null) {
             return true;
         }
 
         return $this->hasPropertySetter($classReflection, $propertyName);
+    }
+
+    public function findWritableType(
+        ClassReflection $classReflection,
+        string $propertyName,
+        Scope $scope
+    ): ?Type {
+        $instanceProperty = $this->findPublicWritableProperty($classReflection, $propertyName, $scope);
+        if ($instanceProperty !== null) {
+            return $instanceProperty->getWritableType();
+        }
+
+        if (!$this->hasPropertySetter($classReflection, $propertyName)) {
+            return null;
+        }
+
+        $parameters = ParametersAcceptorSelector::combineAcceptors(
+            $classReflection->getMethod('set' . ucfirst($propertyName), $scope)->getVariants()
+        )->getParameters();
+
+        return $parameters === [] ? null : $parameters[0]->getType();
     }
 
     public function hasReadableAndWritableProperty(
@@ -75,6 +97,23 @@ final class BaseObjectPropertyAnalyzer
         }
 
         return !$this->hasProperty($classReflection, $attributeName);
+    }
+
+    /**
+     * Yii assigns config values from outside the object (`Yii::configure()`,
+     * `Container::build()`), so a non-public property is set through `__set()`, i.e. its setter.
+     */
+    private function findPublicWritableProperty(
+        ClassReflection $classReflection,
+        string $propertyName,
+        Scope $scope
+    ): ?ExtendedPropertyReflection {
+        $instanceProperty = $this->findInstanceProperty($classReflection, $propertyName, $scope);
+        if ($instanceProperty === null || !$instanceProperty->isPublic() || !$instanceProperty->isWritable()) {
+            return null;
+        }
+
+        return $instanceProperty;
     }
 
     private function looksLikePropertyName(string $name): bool
