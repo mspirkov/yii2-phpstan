@@ -15,10 +15,15 @@ final class SkippedClassesAnalyzer
     public function isSkippedAttribute(string $className, string $attributeName, array $skippedClasses): bool
     {
         foreach ($skippedClasses as $entry) {
-            if (
-                $entry['class'] === $className
-                && (!isset($entry['attributes']) || in_array($attributeName, $entry['attributes'], true))
-            ) {
+            if ($entry['class'] !== $className) {
+                continue;
+            }
+
+            if (!isset($entry['attributes'])) {
+                return true;
+            }
+
+            if (in_array($attributeName, $entry['attributes'], true)) {
                 return true;
             }
         }
