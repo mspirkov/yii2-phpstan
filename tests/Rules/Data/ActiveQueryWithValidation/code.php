@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\ActiveQueryWithValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveQueryWithValidation\BaseRecord;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveQueryWithValidation\Customer;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveQueryWithValidation\MongoCustomer;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveQueryWithValidation\RedisCustomer;
@@ -89,6 +90,17 @@ function invalidNestedViaPropertyReadArray(): void
 
 function skippedUnresolvedBaseClass(ActiveQuery $query): void
 {
+    $query->with('bogus')->all();
+}
+
+/**
+ * @template T of BaseRecord
+ *
+ * @param ActiveQuery<T> $query
+ */
+function skippedTemplateModelClass(ActiveQuery $query): void
+{
+    // T can be any subclass of BaseRecord, so a relation missing on BaseRecord itself may still exist.
     $query->with('bogus')->all();
 }
 
