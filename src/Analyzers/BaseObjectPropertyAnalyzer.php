@@ -99,10 +99,6 @@ final class BaseObjectPropertyAnalyzer
         return !$this->hasProperty($classReflection, $attributeName);
     }
 
-    /**
-     * Yii assigns config values from outside the object (`Yii::configure()`,
-     * `Container::build()`), so a non-public property is set through `__set()`, i.e. its setter.
-     */
     private function findPublicWritableProperty(
         ClassReflection $classReflection,
         string $propertyName,
