@@ -122,6 +122,28 @@ final class AttributeNameShapeModel extends Model
     }
 }
 
+final class ConfigSkippedModel extends Model
+{
+    public function attributeLabels(): array
+    {
+        return [
+            'createdAt' => 'Created at',
+            '' => 'Empty name',
+        ];
+    }
+}
+
+final class ConfigSkippedAttributesModel extends Model
+{
+    public function attributeLabels(): array
+    {
+        return [
+            'createdAt' => 'Created at',
+            'nickname' => 'Nickname',
+        ];
+    }
+}
+
 final class SkippedDynamicModel extends DynamicModel
 {
     public function attributeLabels(): array

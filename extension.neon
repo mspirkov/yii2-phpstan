@@ -55,8 +55,10 @@ parameters:
 			enabled: %mspirkovYii2.enableValidationRules%
 		modelAttributeHintsValidation:
 			enabled: %mspirkovYii2.enableValidationRules%
+			skippedClasses: []
 		modelAttributeLabelsValidation:
 			enabled: %mspirkovYii2.enableValidationRules%
+			skippedClasses: []
 		modelRulesValidation:
 			enabled: %mspirkovYii2.enableValidationRules%
 			customValidators: []
@@ -177,9 +179,17 @@ parametersSchema:
 		])
 		modelAttributeHintsValidation: structure([
 			enabled: bool()
+			skippedClasses: listOf(structure([
+				class: string()
+				?attributes: listOf(string())
+			]))
 		])
 		modelAttributeLabelsValidation: structure([
 			enabled: bool()
+			skippedClasses: listOf(structure([
+				class: string()
+				?attributes: listOf(string())
+			]))
 		])
 		modelRulesValidation: structure([
 			enabled: bool()
@@ -342,8 +352,12 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Rules\HtmlActiveAttributeValidationRule
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\ModelAttributeHintsValidationRule
+		arguments:
+			skippedClasses: %mspirkovYii2.modelAttributeHintsValidation.skippedClasses%
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\ModelAttributeLabelsValidationRule
+		arguments:
+			skippedClasses: %mspirkovYii2.modelAttributeLabelsValidation.skippedClasses%
 	-
 		class: MSpirkov\Yii2\PHPStan\Rules\ModelRulesValidationRule
 		arguments:
@@ -466,6 +480,8 @@ services:
 		class: MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\QueryAnalyzer
+	-
+		class: MSpirkov\Yii2\PHPStan\Analyzers\SkippedClassesAnalyzer
 	-
 		class: MSpirkov\Yii2\PHPStan\Analyzers\ViewFileAnalyzer
 		arguments:

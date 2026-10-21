@@ -6,6 +6,7 @@ namespace MSpirkov\Yii2\PHPStan\Tests\Rules;
 
 use MSpirkov\Yii2\PHPStan\Rules\ModelAttributeHintsValidationRule;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\AttributeNameShapeModel;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\ConfigSkippedAttributesModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\InvalidModel;
 
 /**
@@ -23,8 +24,17 @@ final class ModelAttributeHintsValidationRuleTest extends AbstractTestCase
                 [sprintf('Unknown attribute "unknownAndBadType" for model %s.', InvalidModel::class), 39],
                 [sprintf('Unknown attribute " login " for model %s.', AttributeNameShapeModel::class), 119],
                 [sprintf('Unknown attribute " nickname " for model %s.', AttributeNameShapeModel::class), 120],
+                ['Model attribute hint contains an empty attribute name.', 131],
+                [sprintf('Unknown attribute "nickname" for model %s.', ConfigSkippedAttributesModel::class), 142],
             ],
         );
+    }
+
+    public static function getAdditionalConfigFiles(): array
+    {
+        return array_merge(parent::getAdditionalConfigFiles(), [
+            self::getConfigFilePath('config'),
+        ]);
     }
 
     protected static function getRuleClass(): string

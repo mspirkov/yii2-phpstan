@@ -165,6 +165,24 @@ parameters:
                 -
                     class: app\sdk\ThirdPartySdkClient
 
+        # Models whose attributeHints() keys aren't checked for existence, e.g. a base model with hints
+        # for its subclasses' attributes. Without `attributes`, the whole class is skipped
+        modelAttributeHintsValidation:
+            skippedClasses:
+                -
+                    class: app\models\BaseRecord
+                    attributes:
+                        - created_at
+                        - updated_at
+                -
+                    class: app\models\BaseForm
+
+        # The same for attributeLabels()
+        modelAttributeLabelsValidation:
+            skippedClasses:
+                -
+                    class: app\models\BaseRecord
+
         # Project validator aliases for modelRulesValidation
         modelRulesValidation:
             customValidators:
@@ -746,7 +764,7 @@ echo Html::activeHint($model, 'nickname');        // ✗ typo — "nickname" is 
 
 #### Model attribute hints validation
 
-Checks that the keys of `attributeHints()` are existing attributes and aren't empty.
+Checks that the keys of `attributeHints()` are existing attributes and aren't empty. Skip models in [`skippedClasses`](#rule-options).
 
 ```php
 /**
@@ -769,7 +787,7 @@ final class ContactModel extends Model
 
 #### Model attribute labels validation
 
-Checks that the keys of `attributeLabels()` are existing attributes and aren't empty.
+Checks that the keys of `attributeLabels()` are existing attributes and aren't empty. Skip models in [`skippedClasses`](#rule-options).
 
 ```php
 /**
