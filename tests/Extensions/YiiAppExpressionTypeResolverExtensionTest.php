@@ -34,13 +34,7 @@ final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
             $type
         ));
 
-        $container = self::getContainer();
-        new YiiAppExpressionTypeResolverExtension(
-            [['paths' => [], 'type' => $type]],
-            new PathAnalyzer(),
-            $container->getByType(ExpressionTypeAnalyzer::class),
-            $container->getByType(TypeStringResolver::class)
-        );
+        $this->createExtension($type);
     }
 
     /**
@@ -49,12 +43,47 @@ final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
     public static function dataInvalidTypes(): iterable
     {
         yield 'scalar' => ['int'];
+        yield 'nullable scalar' => ['int|null'];
         yield 'unknown class' => ['app\components\MissingApplication'];
-        yield 'nullable' => ['yii\web\Application|null'];
+    }
+
+    /**
+     * @dataProvider dataNullableTypes
+     */
+    public function testNullableType(string $type): void
+    {
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Type "%s" of the "mspirkovYii2.yiiAppTypes" parameter must not be nullable. Use the "nullable" option instead.',
+            $type
+        ));
+
+        $this->createExtension($type);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataNullableTypes(): iterable
+    {
+        yield 'union with null' => ['yii\web\Application|null'];
+        yield 'nullable shorthand' => ['?yii\web\Application'];
     }
 
     protected static function getAdditionalConfigFile(): string
     {
         return __DIR__ . '/Config/YiiApp/config.neon';
+    }
+
+    private function createExtension(string $type): YiiAppExpressionTypeResolverExtension
+    {
+        $container = self::getContainer();
+
+        return new YiiAppExpressionTypeResolverExtension(
+            [['paths' => [], 'type' => $type]],
+            new PathAnalyzer(),
+            $container->getByType(ExpressionTypeAnalyzer::class),
+            $container->getByType(TypeStringResolver::class)
+        );
     }
 }

@@ -98,12 +98,20 @@ final class YiiAppExpressionTypeResolverExtension implements ExpressionTypeResol
     private function resolveType(string $typeString, TypeStringResolver $typeStringResolver): Type
     {
         $type = $typeStringResolver->resolve($typeString);
-        if (!(new ObjectType(Application::class))->isSuperTypeOf($type)->yes()) {
+        if (!(new ObjectType(Application::class))->isSuperTypeOf(TypeCombinator::removeNull($type))->yes()) {
             throw new InvalidConfigException(sprintf(
                 'Type "%s" of the "%s" parameter is not a type of %s.',
                 $typeString,
                 self::PARAMETER,
                 Application::class
+            ));
+        }
+
+        if (TypeCombinator::containsNull($type)) {
+            throw new InvalidConfigException(sprintf(
+                'Type "%s" of the "%s" parameter must not be nullable. Use the "nullable" option instead.',
+                $typeString,
+                self::PARAMETER
             ));
         }
 
