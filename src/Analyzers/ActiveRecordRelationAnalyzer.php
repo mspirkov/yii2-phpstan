@@ -39,6 +39,11 @@ final class ActiveRecordRelationAnalyzer
             self::ACTIVE_QUERY_MODEL_TEMPLATE_NAME
         );
 
+        // An unresolved template type stands for any subclass of its bound, not the bound itself.
+        if ($templateType->hasTemplateOrLateResolvableType()) {
+            return null;
+        }
+
         $classReflection = $this->expressionTypeAnalyzer->getSingleClassReflectionOfType(
             $templateType,
             BaseActiveRecord::class
