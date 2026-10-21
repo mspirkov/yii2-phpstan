@@ -1,0 +1,10 @@
+parameters:
+	mspirkovYii2:
+		modelAttributeHintsValidation:
+			skippedClasses:
+				-
+					class: MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\ConfigSkippedModel
+				-
+					class: MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\ConfigSkippedAttributesModel
+					attributes:
+						- createdAt

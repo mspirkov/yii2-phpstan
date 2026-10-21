@@ -17,6 +17,9 @@ use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\VerbosityLevel;
 
+/**
+ * @phpstan-import-type SkippedClasses from SkippedClassesAnalyzer
+ */
 final class BaseObjectConfigAnalyzer
 {
     private const CONSTRUCT_OPTION_KEY = '__construct()';
@@ -32,26 +35,24 @@ final class BaseObjectConfigAnalyzer
 
     private BaseObjectPropertyAnalyzer $baseObjectPropertyAnalyzer;
 
-    /** @var array<string, list<string>|null> */
-    private array $skippedAttributesByClass;
+    private SkippedClassesAnalyzer $skippedClassesAnalyzer;
+
+    /** @var SkippedClasses */
+    private array $skippedClasses;
 
     /**
-     * @param list<array{class: string, attributes?: list<string>}> $skippedClasses
+     * @param SkippedClasses $skippedClasses
      */
     public function __construct(
         ReflectionProvider $reflectionProvider,
         BaseObjectPropertyAnalyzer $baseObjectPropertyAnalyzer,
+        SkippedClassesAnalyzer $skippedClassesAnalyzer,
         array $skippedClasses
     ) {
         $this->reflectionProvider = $reflectionProvider;
         $this->baseObjectPropertyAnalyzer = $baseObjectPropertyAnalyzer;
-
-        $skippedAttributesByClass = [];
-        foreach ($skippedClasses as $entry) {
-            $skippedAttributesByClass[$entry['class']] = $entry['attributes'] ?? null;
-        }
-
-        $this->skippedAttributesByClass = $skippedAttributesByClass;
+        $this->skippedClassesAnalyzer = $skippedClassesAnalyzer;
+        $this->skippedClasses = $skippedClasses;
     }
 
     /**
@@ -305,15 +306,14 @@ final class BaseObjectConfigAnalyzer
      */
     private function filterSkippedOptions(string $className, array $options): array
     {
-        if (!array_key_exists($className, $this->skippedAttributesByClass)) {
-            return $options;
-        }
-
-        $skippedOptionNames = $this->skippedAttributesByClass[$className];
-        if ($skippedOptionNames === null) {
-            return [];
-        }
-
-        return array_diff_key($options, array_flip($skippedOptionNames));
+        return array_filter(
+            $options,
+            fn(string $optionName): bool => !$this->skippedClassesAnalyzer->isSkippedAttribute(
+                $className,
+                $optionName,
+                $this->skippedClasses
+            ),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

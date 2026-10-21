@@ -122,6 +122,28 @@ final class AttributeNameShapeModel extends Model
     }
 }
 
+final class ConfigSkippedModel extends Model
+{
+    public function attributeHints(): array
+    {
+        return [
+            'createdAt' => 'Creation time',
+            '' => 'Empty name',
+        ];
+    }
+}
+
+final class ConfigSkippedAttributesModel extends Model
+{
+    public function attributeHints(): array
+    {
+        return [
+            'createdAt' => 'Creation time',
+            'nickname' => 'Your nickname',
+        ];
+    }
+}
+
 final class SkippedDynamicModel extends DynamicModel
 {
     public function attributeHints(): array

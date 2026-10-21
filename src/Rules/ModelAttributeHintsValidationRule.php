@@ -8,6 +8,7 @@ use MSpirkov\Yii2\PHPStan\Analyzers\BaseObjectConfigAnalyzer;
 use MSpirkov\Yii2\PHPStan\Analyzers\BaseObjectPropertyAnalyzer;
 use MSpirkov\Yii2\PHPStan\Analyzers\ComponentConfigMethodAnalyzer;
 use MSpirkov\Yii2\PHPStan\Analyzers\ModelAnalyzer;
+use MSpirkov\Yii2\PHPStan\Analyzers\SkippedClassesAnalyzer;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -18,6 +19,8 @@ use yii\base\Model;
 
 /**
  * @implements Rule<ClassMethod>
+ *
+ * @phpstan-import-type SkippedClasses from SkippedClassesAnalyzer
  */
 final class ModelAttributeHintsValidationRule implements Rule
 {
@@ -29,16 +32,28 @@ final class ModelAttributeHintsValidationRule implements Rule
 
     private ModelAnalyzer $modelAnalyzer;
 
+    private SkippedClassesAnalyzer $skippedClassesAnalyzer;
+
+    /** @var SkippedClasses */
+    private array $skippedClasses;
+
+    /**
+     * @param SkippedClasses $skippedClasses
+     */
     public function __construct(
         BaseObjectConfigAnalyzer $baseObjectConfigAnalyzer,
         BaseObjectPropertyAnalyzer $baseObjectPropertyAnalyzer,
         ComponentConfigMethodAnalyzer $componentConfigMethodAnalyzer,
-        ModelAnalyzer $modelAnalyzer
+        ModelAnalyzer $modelAnalyzer,
+        SkippedClassesAnalyzer $skippedClassesAnalyzer,
+        array $skippedClasses
     ) {
         $this->baseObjectConfigAnalyzer = $baseObjectConfigAnalyzer;
         $this->baseObjectPropertyAnalyzer = $baseObjectPropertyAnalyzer;
         $this->componentConfigMethodAnalyzer = $componentConfigMethodAnalyzer;
         $this->modelAnalyzer = $modelAnalyzer;
+        $this->skippedClassesAnalyzer = $skippedClassesAnalyzer;
+        $this->skippedClasses = $skippedClasses;
     }
 
     public function getNodeType(): string
@@ -90,16 +105,22 @@ final class ModelAttributeHintsValidationRule implements Rule
     private function validateAttributeExists(string $attributeName, Node $node, Scope $scope): array
     {
         $classReflection = $scope->getClassReflection();
-        if (
-            $this->modelAnalyzer->shouldSkipAttributeExistenceCheck($classReflection)
-            || !$this->baseObjectPropertyAnalyzer->isUnknownAttribute($classReflection, $attributeName)
-        ) {
+        if ($this->modelAnalyzer->shouldSkipAttributeExistenceCheck($classReflection)) {
+            return [];
+        }
+
+        $className = $classReflection->getName();
+        if ($this->skippedClassesAnalyzer->isSkippedAttribute($className, $attributeName, $this->skippedClasses)) {
+            return [];
+        }
+
+        if (!$this->baseObjectPropertyAnalyzer->isUnknownAttribute($classReflection, $attributeName)) {
             return [];
         }
 
         return [
             $this->buildError(
-                sprintf('Unknown attribute "%s" for model %s.', $attributeName, $classReflection->getName()),
+                sprintf('Unknown attribute "%s" for model %s.', $attributeName, $className),
                 $node
             ),
         ];
