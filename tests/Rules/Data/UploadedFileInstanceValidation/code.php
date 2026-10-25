@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\UploadedFileInstanceValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinAttributeModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\UploadedFileInstanceValidation\NotUploadedFile;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\UploadedFileInstanceValidation\OtherForm;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\UploadedFileInstanceValidation\UploadForm;
@@ -24,6 +25,16 @@ final class InvalidFormUsage
     {
         UploadedFile::getInstance($model, 'imagefile');
         UploadedFile::getInstances($model, 'imageFiles');
+    }
+}
+
+final class MixinAttributeUsage
+{
+    public function run(MixinAttributeModel $model): void
+    {
+        UploadedFile::getInstance($model, 'tagNames');
+        UploadedFile::getInstances($model, 'tagValues');
+        UploadedFile::getInstance($model, 'nickname');
     }
 }
 

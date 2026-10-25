@@ -10,6 +10,7 @@ use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\S
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\SimpleObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\ThirdPartyObject;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\BaseObjectInstantiationValidation\VariadicObject;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinComponent;
 use stdClass;
 
 final class ValidObjectUsage
@@ -49,6 +50,14 @@ final class InvalidObjectUsage
         // A non-public property is only settable from config through a setter.
         new SetterObject(['transport' => 5]);
         new SetterObject(['secret' => 'x']);
+    }
+}
+
+final class MixinObjectUsage
+{
+    public function run(): void
+    {
+        new MixinComponent(['tagNames' => 'php,yii', 'tagValues' => [1, 2], 'nickname' => 'x']);
     }
 }
 

@@ -3,6 +3,7 @@
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\BehaviorAttributesValidation;
 
 use MSpirkov\Yii2\Db\ActiveRecord\DateTimeBehavior;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\TaggableBehavior;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\behaviors\AttributeBehavior;
@@ -154,6 +155,30 @@ final class InvalidPost extends Model
                 'class' => AttributeBehavior::class,
                 'attributes' => [
                     BaseActiveRecord::EVENT_BEFORE_INSERT => ['createdAt', 'updatedAt'],
+                ],
+            ],
+        ];
+    }
+}
+
+/**
+ * @mixin TaggableBehavior
+ */
+final class MixinAttributePost extends Model
+{
+    public $title;
+
+    public function behaviors(): array
+    {
+        return [
+            TaggableBehavior::class,
+            [
+                'class' => AttributeTypecastBehavior::class,
+                'attributeTypes' => [
+                    'title' => AttributeTypecastBehavior::TYPE_STRING,
+                    'tagNames' => AttributeTypecastBehavior::TYPE_STRING,
+                    'tagValues' => AttributeTypecastBehavior::TYPE_STRING,
+                    'nickname' => AttributeTypecastBehavior::TYPE_STRING,
                 ],
             ],
         ];

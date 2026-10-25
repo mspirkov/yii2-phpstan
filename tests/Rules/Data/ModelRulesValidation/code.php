@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\TaggableBehavior;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\validators\RequiredValidator;

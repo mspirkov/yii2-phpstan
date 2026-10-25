@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules;
 
 use MSpirkov\Yii2\PHPStan\Rules\UploadedFileInstanceValidationRule;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinAttributeModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\UploadedFileInstanceValidation\UploadForm;
 
 /**
@@ -17,8 +18,9 @@ final class UploadedFileInstanceValidationRuleTest extends AbstractTestCase
         $this->analyse(
             [self::getDataFilePath('code')],
             [
-                [sprintf('Unknown attribute "imagefile" for model %s in getInstance() call.', UploadForm::class), 25],
-                [sprintf('Unknown attribute "imageFiles" for model %s in getInstances() call.', UploadForm::class), 26],
+                [sprintf('Unknown attribute "imagefile" for model %s in getInstance() call.', UploadForm::class), 26],
+                [sprintf('Unknown attribute "imageFiles" for model %s in getInstances() call.', UploadForm::class), 27],
+                [sprintf('Unknown attribute "nickname" for model %s in getInstance() call.', MixinAttributeModel::class), 37],
             ],
         );
     }

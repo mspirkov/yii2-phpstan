@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\HtmlActiveAttributeValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinAttributeModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\HtmlActiveAttributeValidation\ContactModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\HtmlActiveAttributeValidation\NotHtml;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\HtmlActiveAttributeValidation\OtherModel;
@@ -27,6 +28,16 @@ final class InvalidContactUsage
         Html::activeHint($model, 'nickname');
         Html::activeInput('text', $model, 'nmae');
         Html::activeTextInput($model, 'nickname');
+    }
+}
+
+final class MixinAttributeUsage
+{
+    public function run(MixinAttributeModel $model): void
+    {
+        Html::activeLabel($model, 'tagNames');
+        Html::activeTextInput($model, 'tagValues');
+        Html::activeHint($model, 'nickname');
     }
 }
 

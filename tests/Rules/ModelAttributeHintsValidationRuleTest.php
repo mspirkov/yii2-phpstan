@@ -8,6 +8,7 @@ use MSpirkov\Yii2\PHPStan\Rules\ModelAttributeHintsValidationRule;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\AttributeNameShapeModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\ConfigSkippedAttributesModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\InvalidModel;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation\MixinAttributeModel;
 
 /**
  * @extends AbstractTestCase<ModelAttributeHintsValidationRule>
@@ -19,13 +20,14 @@ final class ModelAttributeHintsValidationRuleTest extends AbstractTestCase
         $this->analyse(
             [self::getDataFilePath('code')],
             [
-                [sprintf('Unknown attribute "nickname" for model %s.', InvalidModel::class), 35],
-                ['Model attribute hint contains an empty attribute name.', 38],
-                [sprintf('Unknown attribute "unknownAndBadType" for model %s.', InvalidModel::class), 39],
-                [sprintf('Unknown attribute " login " for model %s.', AttributeNameShapeModel::class), 119],
-                [sprintf('Unknown attribute " nickname " for model %s.', AttributeNameShapeModel::class), 120],
-                ['Model attribute hint contains an empty attribute name.', 131],
-                [sprintf('Unknown attribute "nickname" for model %s.', ConfigSkippedAttributesModel::class), 142],
+                [sprintf('Unknown attribute "nickname" for model %s.', InvalidModel::class), 36],
+                ['Model attribute hint contains an empty attribute name.', 39],
+                [sprintf('Unknown attribute "unknownAndBadType" for model %s.', InvalidModel::class), 40],
+                [sprintf('Unknown attribute "nickname" for model %s.', MixinAttributeModel::class), 129],
+                [sprintf('Unknown attribute " login " for model %s.', AttributeNameShapeModel::class), 143],
+                [sprintf('Unknown attribute " nickname " for model %s.', AttributeNameShapeModel::class), 144],
+                ['Model attribute hint contains an empty attribute name.', 155],
+                [sprintf('Unknown attribute "nickname" for model %s.', ConfigSkippedAttributesModel::class), 166],
             ],
         );
     }

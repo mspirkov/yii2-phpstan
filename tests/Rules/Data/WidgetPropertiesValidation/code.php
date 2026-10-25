@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\WidgetPropertiesValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\WidgetPropertiesValidation\MixinWidget;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\WidgetPropertiesValidation\MyWidget;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\WidgetPropertiesValidation\NotAWidget;
 
@@ -48,6 +49,15 @@ function withWidgetMethod(): void
 {
     MyWidget::widget([
         'unknownOption' => 'x',
+    ]);
+}
+
+function withMixinProperties(): void
+{
+    MixinWidget::widget([
+        'tagNames' => 'php,yii',
+        'tagValues' => [1, 2],
+        'nickname' => 'x',
     ]);
 }
 
