@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\YiiCreateObjectValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinComponent;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\YiiCreateObjectValidation\CreatableComponent;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\YiiCreateObjectValidation\NotYii;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\YiiCreateObjectValidation\PlainObject;
@@ -113,6 +114,16 @@ function withPlainObjectConfig(): void
     \Yii::createObject([
         'class' => PlainObject::class,
         'unknownOption' => 'x',
+    ]);
+}
+
+function withMixinConfig(): void
+{
+    \Yii::createObject([
+        'class' => MixinComponent::class,
+        'tagNames' => 'php,yii',
+        'tagValues' => [1, 2],
+        'nickname' => 'x',
     ]);
 }
 

@@ -6,6 +6,7 @@ namespace MSpirkov\Yii2\PHPStan\Tests\Rules;
 
 use MSpirkov\Yii2\PHPStan\Rules\ActiveFormFieldValidationRule;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveFormFieldValidation\ContactModel;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinAttributeModel;
 use yii\base\Model;
 
 /**
@@ -18,11 +19,12 @@ final class ActiveFormFieldValidationRuleTest extends AbstractTestCase
         $this->analyse(
             [self::getDataFilePath('code')],
             [
-                [sprintf('Attribute "nickname" is not readable and writable or does not exist on model %s.', ContactModel::class), 24],
-                [sprintf('Attribute "fullName" is not readable and writable or does not exist on model %s.', ContactModel::class), 29],
-                [sprintf('Attribute "status" is not readable and writable or does not exist on model %s.', ContactModel::class), 39],
-                [sprintf('Attribute "secret" is not readable and writable or does not exist on model %s.', ContactModel::class), 44],
-                [sprintf('Attribute "nickname" is not readable and writable or does not exist on model %s.', Model::class), 80],
+                [sprintf('Attribute "nickname" is not readable and writable or does not exist on model %s.', ContactModel::class), 25],
+                [sprintf('Attribute "fullName" is not readable and writable or does not exist on model %s.', ContactModel::class), 30],
+                [sprintf('Attribute "status" is not readable and writable or does not exist on model %s.', ContactModel::class), 40],
+                [sprintf('Attribute "secret" is not readable and writable or does not exist on model %s.', ContactModel::class), 45],
+                [sprintf('Attribute "nickname" is not readable and writable or does not exist on model %s.', MixinAttributeModel::class), 52],
+                [sprintf('Attribute "nickname" is not readable and writable or does not exist on model %s.', Model::class), 88],
             ],
         );
     }

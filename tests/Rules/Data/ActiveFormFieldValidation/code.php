@@ -5,6 +5,7 @@ namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\ActiveFormFieldValidation;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveFormFieldValidation\ContactModel;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveFormFieldValidation\NotActiveForm;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ActiveFormFieldValidation\OtherModel;
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\MixinAttributeModel;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\widgets\ActiveForm;
@@ -42,6 +43,13 @@ function withGetterOnlyProperty(ActiveForm $form, ContactModel $model): void
 function withSetterOnlyProperty(ActiveForm $form, ContactModel $model): void
 {
     $form->field($model, 'secret');
+}
+
+function withMixinProperty(ActiveForm $form, MixinAttributeModel $model): void
+{
+    $form->field($model, 'tagNames');
+    $form->field($model, 'tagValues');
+    $form->field($model, 'nickname');
 }
 
 function withDynamicAttribute(ActiveForm $form, ContactModel $model, string $attribute): void

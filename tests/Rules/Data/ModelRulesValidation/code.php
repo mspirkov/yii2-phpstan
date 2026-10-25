@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\TaggableBehavior;
 use yii\base\DynamicModel;
 use yii\base\Model;
 use yii\validators\RequiredValidator;
@@ -300,6 +301,27 @@ final class MagicAttributeModel extends Model
 
     public function setSecret(string $value): void
     {
+    }
+}
+
+/**
+ * @mixin TaggableBehavior
+ */
+final class MixinAttributeModel extends Model
+{
+    public $login;
+
+    public function behaviors(): array
+    {
+        return [TaggableBehavior::class];
+    }
+
+    public function rules(): array
+    {
+        return [
+            [['login', 'tagNames', 'tagValues'], 'safe'],
+            ['nickname', 'safe'],
+        ];
     }
 }
 

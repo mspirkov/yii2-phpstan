@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelAttributeHintsValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\TaggableBehavior;
 use yii\base\DynamicModel;
 use yii\base\Model;
 
@@ -104,6 +105,29 @@ final class MagicAttributeModel extends Model
 
     public function setSecret(string $value): void
     {
+    }
+}
+
+/**
+ * @mixin TaggableBehavior
+ */
+final class MixinAttributeModel extends Model
+{
+    public $login;
+
+    public function behaviors(): array
+    {
+        return [TaggableBehavior::class];
+    }
+
+    public function attributeHints(): array
+    {
+        return [
+            'login' => 'Your login name',
+            'tagNames' => 'Your tag names',
+            'tagValues' => 'Your tag values',
+            'nickname' => 'Your nickname',
+        ];
     }
 }
 

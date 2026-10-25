@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\ModelScenariosValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\Common\TaggableBehavior;
 use yii\base\DynamicModel;
 use yii\base\Model;
 
@@ -42,6 +43,27 @@ final class InvalidModel extends Model
             'emptyAttribute' => [''],
             'badAttributeType' => [123],
             'notArray' => 'login',
+        ];
+    }
+}
+
+/**
+ * @mixin TaggableBehavior
+ */
+final class MixinAttributeModel extends Model
+{
+    public $login;
+
+    public function behaviors(): array
+    {
+        return [TaggableBehavior::class];
+    }
+
+    public function scenarios(): array
+    {
+        return [
+            'default' => ['login', 'tagNames', 'tagValues'],
+            'register' => ['login', 'nickname'],
         ];
     }
 }

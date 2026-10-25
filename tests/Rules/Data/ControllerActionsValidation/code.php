@@ -2,6 +2,7 @@
 
 namespace MSpirkov\Yii2\PHPStan\Tests\Rules\Data\ControllerActionsValidation;
 
+use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ControllerActionsValidation\MixinAction;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ControllerActionsValidation\NotAction;
 use MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ControllerActionsValidation\ProjectAction;
 use yii\base\Controller;
@@ -70,6 +71,21 @@ final class InvalidController extends Controller
             'wrongEnabled' => ['class' => ProjectAction::class, 'enabled' => 1],
             'wrongEnabledString' => ['__class' => ProjectAction::class, 'enabled' => 'yes'],
             'wrongThreshold' => ['class' => ProjectAction::class, 'threshold' => 'high'],
+        ];
+    }
+}
+
+final class MixinController extends Controller
+{
+    public function actions(): array
+    {
+        return [
+            'tags' => [
+                'class' => MixinAction::class,
+                'tagNames' => 'php,yii',
+                'tagValues' => [1, 2],
+                'nickname' => 'x',
+            ],
         ];
     }
 }
