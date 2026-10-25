@@ -4,6 +4,7 @@
 [![Yii2](https://img.shields.io/badge/%3E%3D2.0.53-247BA0.svg?style=for-the-badge&logo=yii&logoColor=white&label=Yii)](https://github.com/yiisoft/yii2/releases/tag/2.0.53)
 [![PHPStan](https://img.shields.io/badge/%3E%3D2.2.0-247BA0.svg?style=for-the-badge&label=PHPStan)](https://github.com/phpstan/phpstan/releases/tag/2.2.0)
 [![Total Downloads](https://img.shields.io/packagist/dt/mspirkov/yii2-phpstan.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads)](https://packagist.org/packages/mspirkov/yii2-phpstan)
+[![Downloads (yii2-phpstan-rules)](https://img.shields.io/packagist/dt/mspirkov/yii2-phpstan-rules.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads%20%28yii2-phpstan-rules%29)](https://packagist.org/packages/mspirkov/yii2-phpstan-rules)
 [![Tests](https://img.shields.io/github/actions/workflow/status/mspirkov/yii2-phpstan/ci.yml?branch=main&style=for-the-badge&logo=github&label=Tests)](https://github.com/mspirkov/yii2-phpstan/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/mspirkov/yii2-phpstan.svg?branch=main&style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/mspirkov/yii2-phpstan)
 [![PHPStan Level Max](https://img.shields.io/badge/Max-7A86B8.svg?style=for-the-badge&label=PHPStan%20Level)](https://github.com/mspirkov/yii2-phpstan/blob/main/phpstan.dist.neon)
