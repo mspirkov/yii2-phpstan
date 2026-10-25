@@ -27,15 +27,20 @@ final class YiiAppExpressionTypeResolverExtension implements ExpressionTypeResol
     /** @var list<list<string>> */
     private array $paths = [];
 
-    /** @var list<array{type: ?Type, nullable: bool}> */
+    /** @var list<array{type: ?string, nullable: bool}> */
     private array $yiiAppTypes = [];
 
     private PathAnalyzer $pathAnalyzer;
 
     private ExpressionTypeAnalyzer $expressionTypeAnalyzer;
 
+    private TypeStringResolver $typeStringResolver;
+
     /** @var array<string, list<int>> */
     private array $fileTypeIndexes = [];
+
+    /** @var array<int, Type> */
+    private array $resolvedTypes = [];
 
     /**
      * @param list<array{paths: list<string>, type?: string, nullable?: bool}> $yiiAppTypes
@@ -49,15 +54,14 @@ final class YiiAppExpressionTypeResolverExtension implements ExpressionTypeResol
         foreach ($yiiAppTypes as $yiiAppType) {
             $this->paths[] = $pathAnalyzer->resolveRealPaths($yiiAppType['paths'], self::PARAMETER);
             $this->yiiAppTypes[] = [
-                'type' => isset($yiiAppType['type'])
-                    ? $this->resolveType($yiiAppType['type'], $typeStringResolver)
-                    : null,
+                'type' => $yiiAppType['type'] ?? null,
                 'nullable' => $yiiAppType['nullable'] ?? true,
             ];
         }
 
         $this->pathAnalyzer = $pathAnalyzer;
         $this->expressionTypeAnalyzer = $expressionTypeAnalyzer;
+        $this->typeStringResolver = $typeStringResolver;
     }
 
     public function getType(Expr $expr, Scope $scope): ?Type
@@ -88,16 +92,34 @@ final class YiiAppExpressionTypeResolverExtension implements ExpressionTypeResol
 
         $types = [];
         foreach ($indexes as $index) {
-            $type = $this->yiiAppTypes[$index]['type'] ?? $declaredType;
+            $type = $this->findConfiguredType($index) ?? $declaredType;
             $types[] = $this->yiiAppTypes[$index]['nullable'] ? TypeCombinator::addNull($type) : $type;
         }
 
         return TypeCombinator::union(...$types);
     }
 
-    private function resolveType(string $typeString, TypeStringResolver $typeStringResolver): Type
+    /**
+     * Resolves the type on first use rather than in the constructor: PHPStan also creates this extension in the stub
+     * validation container, whose reflection only knows the stub files, so the configured types can't be checked there.
+     */
+    private function findConfiguredType(int $index): ?Type
     {
-        $type = $typeStringResolver->resolve($typeString);
+        $typeString = $this->yiiAppTypes[$index]['type'];
+        if ($typeString === null) {
+            return null;
+        }
+
+        if (!isset($this->resolvedTypes[$index])) {
+            $this->resolvedTypes[$index] = $this->resolveType($typeString);
+        }
+
+        return $this->resolvedTypes[$index];
+    }
+
+    private function resolveType(string $typeString): Type
+    {
+        $type = $this->typeStringResolver->resolve($typeString);
         if (!(new ObjectType(Application::class))->isSuperTypeOf(TypeCombinator::removeNull($type))->yes()) {
             throw new InvalidConfigException(sprintf(
                 'Type "%s" of the "%s" parameter is not a type of %s.',

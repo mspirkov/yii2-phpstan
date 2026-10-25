@@ -1,0 +1,11 @@
+<?php
+
+namespace MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\YiiApp;
+
+class ApiApplication
+{
+    public function getUniqueId(): string
+    {
+        return trim('');
+    }
+}
