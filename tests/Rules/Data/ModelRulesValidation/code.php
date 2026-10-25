@@ -303,6 +303,27 @@ final class MagicAttributeModel extends Model
     }
 }
 
+/**
+ * @mixin TaggableBehavior
+ */
+final class MixinAttributeModel extends Model
+{
+    public $login;
+
+    public function behaviors(): array
+    {
+        return [TaggableBehavior::class];
+    }
+
+    public function rules(): array
+    {
+        return [
+            [['login', 'tagNames', 'tagValues'], 'safe'],
+            ['nickname', 'safe'],
+        ];
+    }
+}
+
 final class AttributeNameShapeModel extends Model
 {
     public $login;

@@ -55,8 +55,9 @@ final class ModelRulesValidationRuleTest extends AbstractTestCase
             ['Unknown validator "missingValidatorAlias".', 239],
             ['Unknown attribute "nickname" for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\UnknownAttributeModel.', 278],
             ['Unknown attribute "nickname" for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\UnknownAttributeModel.', 279],
-            ['Unknown attribute " login " for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\AttributeNameShapeModel.', 315],
-            ['Unknown attribute " nickname " for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\AttributeNameShapeModel.', 316],
+            ['Unknown attribute "nickname" for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\MixinAttributeModel.', 322],
+            ['Unknown attribute " login " for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\AttributeNameShapeModel.', 336],
+            ['Unknown attribute " nickname " for model MSpirkov\Yii2\PHPStan\Tests\Rules\Source\ModelRulesValidation\AttributeNameShapeModel.', 337],
         ];
 
         $this->analyse([self::getDataFilePath('code')], $errors);
