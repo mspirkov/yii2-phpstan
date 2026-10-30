@@ -8,12 +8,18 @@ use Closure;
 use MSpirkov\Yii2\PHPStan\Config\ApplicationConfigProvider;
 use MSpirkov\Yii2\PHPStan\Resolvers\ConfigValueTypeResolver;
 use PHPStan\Analyser\Scope;
+use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use yii\web\IdentityInterface;
+use yii\web\User;
 
 final class ApplicationConfigAnalyzer
 {
+    private const USER_COMPONENT_ID = 'user';
+
     private ApplicationConfigProvider $applicationConfigProvider;
 
     private ContainerDefinitionAnalyzer $containerDefinitionAnalyzer;
@@ -87,9 +93,43 @@ final class ApplicationConfigAnalyzer
             return $this->configValueTypeResolver->resolveClassType(get_class($definition));
         }
 
-        return $definition === null
-            ? null
-            : $this->containerDefinitionAnalyzer->resolveYiiCreateObjectType($definition, $config);
+        if ($definition === null) {
+            return null;
+        }
+
+        if ($id === self::USER_COMPONENT_ID && is_array($definition) && !isset($definition['class'])) {
+            $definition['class'] = User::class;
+        }
+
+        $type = $this->containerDefinitionAnalyzer->resolveYiiCreateObjectType($definition, $config);
+        if ($type === null || !(new ObjectType(User::class))->isSuperTypeOf($type)->yes()) {
+            return $type;
+        }
+
+        $identityType = $this->resolveIdentityType($definition);
+        if ($identityType === null) {
+            return $type;
+        }
+
+        return TypeCombinator::intersect($type, new GenericObjectType(User::class, [$identityType]));
+    }
+
+    /**
+     * @param mixed $definition
+     */
+    private function resolveIdentityType($definition): ?Type
+    {
+        $identityClass = is_array($definition) ? $definition['identityClass'] ?? null : null;
+        if (!is_string($identityClass)) {
+            return null;
+        }
+
+        $identityType = $this->configValueTypeResolver->resolveClassType($identityClass);
+        if ($identityType === null) {
+            return null;
+        }
+
+        return (new ObjectType(IdentityInterface::class))->isSuperTypeOf($identityType)->yes() ? $identityType : null;
     }
 
     /**
