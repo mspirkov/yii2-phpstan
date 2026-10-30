@@ -258,18 +258,20 @@ Yii::$app;                 // yii\console\Application|yii\web\Application|null, 
 
 ### `Yii::$app` components
 
-Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` to the class set in `components`.
+Resolves `Yii::$app->payments` and `Yii::$app->get('payments')` to the class set in `components`, and the identity of the `user` component to its `identityClass`.
 
 ```php
 'components' => [
     'mailer' => ['class' => SymfonyMailer::class],
     'payments' => ['class' => StripeGateway::class],
+    'user' => ['identityClass' => User::class],
 ],
 
 Yii::$app->mailer;                 // SymfonyMailer instead of MailerInterface
 Yii::$app->payments;               // StripeGateway instead of an undefined property
 Yii::$app->get('payments');        // StripeGateway instead of object
 Yii::$app->get('payments', false); // StripeGateway|null instead of object|null
+Yii::$app->user->identity;         // User|null instead of IdentityInterface|null
 ```
 
 ### `Yii::$app->params`
