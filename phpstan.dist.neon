@@ -50,3 +50,11 @@ parameters:
             identifier: shipmonk.missingNativeReturnTypehint
             reportUnmatched: false # fails only for PHP > 7.4
             path: src/Rules/ModelRulesValidationRule.php
+
+        # Stub validation has no API outside a full analysis
+        -
+            identifiers:
+                - phpstanApi.classConstant
+                - phpstanApi.method
+            count: 1
+            path: tests/Extensions/YiiAppExpressionTypeResolverExtensionStubsTest.php

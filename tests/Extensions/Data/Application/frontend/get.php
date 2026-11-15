@@ -11,6 +11,7 @@ use MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\PaypalGateway;
 use Yii;
 use yii\base\Module;
 use yii\web\Application;
+use yii\web\User;
 
 use function PHPStan\Testing\assertType;
 
@@ -24,12 +25,12 @@ function resolved(Application $app, bool $flag): void
     assertType(PaypalGateway::class . '|null', $app->get('payments', $flag));
     assertType(Logger::class . '|' . PaypalGateway::class, $app->get($flag ? 'payments' : 'logger'));
     assertType(Clock::class, $app->get('untyped'));
+    assertType(User::class, $app->get('user'));
 }
 
 function skipped(Application $app, Module $module, string $id, bool $flag): void
 {
-    assertType('object', $app->get($flag ? 'payments' : 'user'));
-    assertType('object', $app->get('user'));
+    assertType('object', $app->get($flag ? 'payments' : 'removed'));
     assertType('object', $app->get('removed'));
     assertType('object', $app->get('undefined'));
     assertType('object|null', $app->get('undefined', false));

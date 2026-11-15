@@ -1,0 +1,19 @@
+parameters:
+	mspirkovYii2:
+		applicationConfigs:
+			-
+				paths:
+					- tests/Extensions/Data/Application/user/identity
+				files:
+					- tests/Extensions/Data/Application/user/identity/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/Application/user/typed
+				files:
+					- tests/Extensions/Data/Application/user/typed/config/main.php
+		yiiAppTypes:
+			-
+				paths:
+					- tests/Extensions/Data/Application/user/typed
+				type: yii\web\Application<MSpirkov\Yii2\PHPStan\Tests\Extensions\Source\Application\Identity>
+				nullable: false

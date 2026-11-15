@@ -7,8 +7,14 @@ namespace MSpirkov\Yii2\PHPStan\Tests\Extensions;
 use MSpirkov\Yii2\PHPStan\Analyzers\ExpressionTypeAnalyzer;
 use MSpirkov\Yii2\PHPStan\Analyzers\PathAnalyzer;
 use MSpirkov\Yii2\PHPStan\Extensions\YiiAppExpressionTypeResolverExtension;
+use PhpParser\Node\Expr\StaticPropertyFetch;
+use PhpParser\Node\Name\FullyQualified;
+use PhpParser\Node\VarLikeIdentifier;
+use PHPStan\Analyser\ScopeContext;
+use PHPStan\Analyser\ScopeFactory;
 use PHPStan\PhpDoc\TypeStringResolver;
 use yii\base\InvalidConfigException;
+use yii\BaseYii;
 
 final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
 {
@@ -34,7 +40,7 @@ final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
             $type
         ));
 
-        $this->createExtension($type);
+        $this->resolveYiiAppType($type);
     }
 
     /**
@@ -58,7 +64,7 @@ final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
             $type
         ));
 
-        $this->createExtension($type);
+        $this->resolveYiiAppType($type);
     }
 
     /**
@@ -75,15 +81,21 @@ final class YiiAppExpressionTypeResolverExtensionTest extends AbstractTestCase
         return __DIR__ . '/Config/YiiApp/config.neon';
     }
 
-    private function createExtension(string $type): YiiAppExpressionTypeResolverExtension
+    private function resolveYiiAppType(string $type): void
     {
         $container = self::getContainer();
+        $path = __DIR__ . '/Data/YiiApp/web';
 
-        return new YiiAppExpressionTypeResolverExtension(
-            [['paths' => [], 'type' => $type]],
+        $extension = new YiiAppExpressionTypeResolverExtension(
+            [['paths' => [$path], 'type' => $type]],
             new PathAnalyzer(),
             $container->getByType(ExpressionTypeAnalyzer::class),
             $container->getByType(TypeStringResolver::class)
+        );
+
+        $extension->getType(
+            new StaticPropertyFetch(new FullyQualified(BaseYii::class), new VarLikeIdentifier('app')),
+            $container->getByType(ScopeFactory::class)->create(ScopeContext::create($path . '/code.php'))
         );
     }
 }

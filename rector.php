@@ -6,9 +6,8 @@ use Rector\CodeQuality\Rector\BooleanAnd\SimplifyEmptyArrayCheckRector;
 use Rector\CodeQuality\Rector\Empty_\SimplifyEmptyCheckOnEmptyArrayRector;
 use Rector\CodeQuality\Rector\FuncCall\SortCallLikeNamedArgsRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector;
-use Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector;
+use Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector;
 use Rector\CodeQuality\Rector\If_\SimplifyIfReturnBoolRector;
 use Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector;
 use Rector\Config\RectorConfig;
@@ -16,7 +15,6 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\PropertyProperty\RemoveNullPropertyInitializationRector;
 use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Set\ValueObject\SetList;
-use Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -43,18 +41,15 @@ return RectorConfig::configure()
         // PHP 7.4
         ClosureToArrowFunctionRector::class,
         // Code Quality
-        FlipTypeControlToUseExclusiveTypeRector::class,
+        ExplicitNullableObjectInstanceRector::class,
         IssetOnPropertyObjectToPropertyExistsRector::class,
         SimplifyEmptyArrayCheckRector::class,
         SimplifyEmptyCheckOnEmptyArrayRector::class,
         SortCallLikeNamedArgsRector::class,
         SimplifyIfReturnBoolRector::class,
         ArrayExplicitBoolCompareRector::class,
-        ObjectExplicitBoolCompareRector::class,
         // Dead Code
         SimplifyUselessVariableRector::class,
         RemoveNullPropertyInitializationRector::class,
         RemoveUselessParamTagRector::class,
-        // Type Declarations
-        EmptyOnNullableObjectToInstanceOfRector::class,
     ]);
