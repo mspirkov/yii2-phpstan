@@ -21,9 +21,7 @@ final class ViewFileAnalyzer
     /** @var list<string> */
     private const VIEWS_DIRECTORIES = ['views', 'Views'];
 
-    /**
-     * @var array<string, string>
-     */
+    /** @var array<string, string> */
     private array $aliases;
 
     /** @var list<string> */
