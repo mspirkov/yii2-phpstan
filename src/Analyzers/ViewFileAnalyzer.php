@@ -49,6 +49,7 @@ final class ViewFileAnalyzer
         ExpressionValueResolver $expressionValueResolver,
         NamespaceAnalyzer $namespaceAnalyzer
     ) {
+        uksort($aliases, static fn(string $a, string $b): int => strlen($b) <=> strlen($a));
         $this->aliases = $aliases;
         $this->extensions = $extensions;
         $this->viewPaths = $viewPaths;
@@ -172,13 +173,34 @@ final class ViewFileAnalyzer
      */
     private function resolveAliasedPath(string $alias): array
     {
-        $resolved = $this->resolveAlias($alias);
+        $name = $this->findAliasName($alias);
+        if ($name === null) {
+            return [
+                'path' => null,
+                'alias' => null,
+                'unresolvedAlias' => $this->getAliasRoot($alias),
+            ];
+        }
 
         return [
-            'path' => $resolved['path'],
-            'alias' => $this->getAliasRoot($alias),
-            'unresolvedAlias' => $resolved['unresolvedRoot'],
+            'path' => rtrim($this->aliases[$name], '/\\') . substr($alias, strlen($name)),
+            'alias' => $name,
+            'unresolvedAlias' => null,
         ];
+    }
+
+    /**
+     * The longest configured alias that `$alias` starts with, matched by whole segments as `Yii::getAlias()` does.
+     */
+    private function findAliasName(string $alias): ?string
+    {
+        foreach (array_keys($this->aliases) as $name) {
+            if (strncmp($alias . '/', $name . '/', strlen($name) + 1) === 0) {
+                return $name;
+            }
+        }
+
+        return null;
     }
 
     private function getAliasRoot(string $alias): string
@@ -186,26 +208,6 @@ final class ViewFileAnalyzer
         $separatorPosition = strpos($alias, '/');
 
         return $separatorPosition === false ? $alias : substr($alias, 0, $separatorPosition) . '';
-    }
-
-    /**
-     * @return array{path: string|null, unresolvedRoot: string|null}
-     */
-    private function resolveAlias(string $alias): array
-    {
-        $root = $this->getAliasRoot($alias);
-        $path = $this->aliases[$root] ?? null;
-        if ($path === null) {
-            return [
-                'path' => null,
-                'unresolvedRoot' => $root,
-            ];
-        }
-
-        return [
-            'path' => rtrim($path, '/\\') . substr($alias, strlen($root)),
-            'unresolvedRoot' => null,
-        ];
     }
 
     /**

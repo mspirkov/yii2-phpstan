@@ -133,10 +133,12 @@ How the view existence rules resolve view names:
 ```neon
 parameters:
     mspirkovYii2:
-        # Root aliases (`@app`, not `@app/modules`) for `@alias/...` names. `//...` names go through `@app/views`
+        # Aliases for `@alias/...` names, the longest matching one wins as in `Yii::getAlias()`.
+        # `//...` names go through `@app/views`
         aliases:
             '@app': .
             '@shared': modules/shared
+            '@yii/gii': vendor/yiisoft/yii2-gii/src
 
         # Tried in order for names without an extension, `php` by default
         viewExtensions:
