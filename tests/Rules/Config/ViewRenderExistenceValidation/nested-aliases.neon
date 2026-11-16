@@ -1,0 +1,6 @@
+parameters:
+	mspirkovYii2:
+		aliases:
+			'@ext': tests/Rules/Data/ViewRenderExistenceValidation/nested-aliases/ext
+			'@ext/gii': tests/Rules/Data/ViewRenderExistenceValidation/nested-aliases/gii/
+			'@debug/toolbar': tests/Rules/Data/ViewRenderExistenceValidation/nested-aliases/debug-toolbar
