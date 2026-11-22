@@ -13,6 +13,7 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use yii\base\Module;
 use yii\web\IdentityInterface;
 use yii\web\User;
 
@@ -54,6 +55,17 @@ final class ApplicationConfigAnalyzer
         }
 
         return $types === [] ? null : TypeCombinator::union(...$types);
+    }
+
+    /**
+     * @param string $id A module ID or an ID path of a nested module, e.g. `admin/content`
+     */
+    public function resolveModuleType(string $id, Scope $scope): ?Type
+    {
+        return $this->resolveInScope(
+            $scope,
+            fn(array $config): ?Type => $this->resolveConfigModuleType($id, $config)
+        );
     }
 
     public function resolveParamsType(Scope $scope): ?Type
@@ -130,6 +142,35 @@ final class ApplicationConfigAnalyzer
         }
 
         return (new ObjectType(IdentityInterface::class))->isSuperTypeOf($identityType)->yes() ? $identityType : null;
+    }
+
+    /**
+     * @param array<mixed> $config
+     */
+    private function resolveConfigModuleType(string $id, array $config): ?Type
+    {
+        $definition = $config;
+        foreach (explode('/', $id) as $childId) {
+            $definition = $this->getModules($definition)[$childId] ?? null;
+        }
+
+        $type = $definition instanceof Module
+            ? $this->configValueTypeResolver->resolveClassType(get_class($definition))
+            : $this->containerDefinitionAnalyzer->resolveYiiCreateObjectType($definition, $config);
+
+        return $type !== null && (new ObjectType(Module::class))->isSuperTypeOf($type)->yes() ? $type : null;
+    }
+
+    /**
+     * @param mixed $config An application config or a module definition
+     *
+     * @return array<mixed>
+     */
+    private function getModules($config): array
+    {
+        $modules = is_array($config) ? $config['modules'] ?? null : null;
+
+        return is_array($modules) ? $modules : [];
     }
 
     /**
