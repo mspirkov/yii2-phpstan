@@ -1,0 +1,13 @@
+parameters:
+	mspirkovYii2:
+		applicationConfigs:
+			-
+				paths:
+					- tests/Extensions/Data/Application/module/configured
+				files:
+					- tests/Extensions/Data/Application/module/configured/config/main.php
+			-
+				paths:
+					- tests/Extensions/Data/Application/module/invalid
+				files:
+					- tests/Extensions/Data/Application/module/invalid/config/main.php

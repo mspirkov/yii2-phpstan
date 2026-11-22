@@ -275,6 +275,25 @@ Yii::$app->get('payments', false); // StripeGateway|null instead of object|null
 Yii::$app->user->identity;         // User|null instead of IdentityInterface|null
 ```
 
+### `Yii::$app` modules
+
+Resolves `Yii::$app->getModule()` to the class set in `modules`, and a nested module to the class set in the `modules` of its parent.
+
+```php
+'modules' => [
+    'admin' => [
+        'class' => AdminModule::class,
+        'modules' => [
+            'content' => ['class' => ContentModule::class],
+        ],
+    ],
+],
+
+Yii::$app->getModule('admin');         // AdminModule instead of Module|null
+Yii::$app->getModule('admin', false);  // AdminModule|null instead of Module|null
+Yii::$app->getModule('admin/content'); // ContentModule instead of Module|null
+```
+
 ### `Yii::$app->params`
 
 Resolves to an array shape of `params`, with the values generalized to types.
