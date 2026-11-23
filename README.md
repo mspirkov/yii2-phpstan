@@ -833,7 +833,7 @@ final class ContactModel extends Model
 
 #### Model validation rules validation
 
-Checks each entry of `rules()` against its validator: unknown validators, unknown or mistyped options, missing required options and invalid regexes. Add project validator aliases in [`customValidators`](#rule-options).
+Checks each entry of `rules()` against its validator: unknown validators, missing inline validator methods, unknown or mistyped options, missing required options and invalid regexes. Add project validator aliases in [`customValidators`](#rule-options).
 
 ```php
 public function rules(): array
@@ -844,6 +844,7 @@ public function rules(): array
         ['ip', 'ip', 'ipv4' => false, 'ipv6' => false],   // ✗ disables both protocols
         ['message', 'string', 'max' => 'invalid'],        // ✗ 'max' must be int|null
         ['status', 'someUnregisteredAlias'],              // ✗ unknown validator
+        ['password', 'validatePasswrod'],                 // ✗ typo — no such validator or model method
 
         ['name', 'string', 'max' => 255],                 // ✓
     ];
